@@ -1,3 +1,65 @@
+
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "1",
+      "description": "User Avatar 1",
+      "imageUrl": "https://picsum.photos/seed/1/200/200",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "2",
+      "description": "User Avatar 2",
+      "imageUrl": "https://picsum.photos/seed/2/200/200",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "3",
+      "description": "User Avatar 3",
+      "imageUrl": "https://picsum.photos/seed/3/200/200",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "4",
+      "description": "User Avatar 4",
+      "imageUrl": "https://picsum.photos/seed/4/200/200",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "5",
+      "description": "User Avatar 5",
+      "imageUrl": "https://picsum.photos/seed/5/200/200",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "6",
+      "description": "User Avatar 6",
+      "imageUrl": "https://picsum.photos/seed/6/200/200",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "7",
+      "description": "User Avatar 7",
+      "imageUrl": "https://picsum.photos/seed/7/200/200",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "10",
+      "description": "Status Image 1",
+      "imageUrl": "https://picsum.photos/seed/10/400/700",
+      "imageHint": "nature landscape"
+    },
+    {
+      "id": "11",
+      "description": "Status Image 2",
+      "imageUrl": "https://picsum.photos/seed/11/400/700",
+      "imageHint": "city life"
+    },
+    {
+      "id": "12",
+      "description": "Status Image 3",
+      "imageUrl": "https://picsum.photos/seed/12/400/700",
+      "imageHint": "abstract art"
+    }
+  ]
 }
