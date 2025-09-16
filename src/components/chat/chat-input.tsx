@@ -1,10 +1,11 @@
+
 "use client";
 
 import { useState, useEffect, useTransition, useRef } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Paperclip, Send, Smile, Loader2, Image as ImageIcon, Contact, MapPin } from "lucide-react";
+import { Paperclip, Send, Smile, Loader2, Image as ImageIcon, Contact, MapPin, Film, Music } from "lucide-react";
 import { generateSmartReplies, describeImage } from "@/actions/ai-actions";
 import { type Message, type Attachment } from "@/lib/data";
 import { loggedInUserId } from "@/lib/data";
@@ -69,9 +70,19 @@ export function ChatInput({ onSendMessage, lastMessage }: ChatInputProps) {
       reader.onload = (e) => {
         const url = e.target?.result as string;
         
-        let attachmentType: 'image' | 'video' = 'image';
+        let attachmentType: 'image' | 'video' | 'audio' = 'image';
         if (file.type.startsWith('video')) {
-            alert("Video attachments are not supported yet.");
+            attachmentType = 'video';
+        } else if (file.type.startsWith('audio')) {
+            attachmentType = 'audio';
+        } else if (file.type.startsWith('image')) {
+            attachmentType = 'image';
+        } else {
+            toast({
+                variant: 'destructive',
+                title: 'Unsupported File Type',
+                description: 'You can only send images, videos, or audio files.'
+            });
             return;
         }
 
@@ -83,11 +94,15 @@ export function ChatInput({ onSendMessage, lastMessage }: ChatInputProps) {
             size: file.size,
         };
         
-        startImageDescribeTransition(async () => {
-            const result = await describeImage({ photoDataUri: url });
-            newAttachment.description = result.description;
+        if (attachmentType === 'image') {
+            startImageDescribeTransition(async () => {
+                const result = await describeImage({ photoDataUri: url });
+                newAttachment.description = result.description;
+                onSendMessage("", newAttachment);
+            });
+        } else {
             onSendMessage("", newAttachment);
-        });
+        }
       };
       reader.readAsDataURL(file);
     }
@@ -186,7 +201,7 @@ export function ChatInput({ onSendMessage, lastMessage }: ChatInputProps) {
                         <div className="flex flex-col gap-2">
                             <Button variant="ghost" className="justify-start" onClick={handleAttachmentClick}>
                                 <ImageIcon className="mr-2 h-4 w-4" />
-                                Image & Video
+                                Photo or Video
                             </Button>
                             <Button variant="ghost" className="justify-start" onClick={handleShareContact}>
                                 <Contact className="mr-2 h-4 w-4" />
@@ -214,7 +229,7 @@ export function ChatInput({ onSendMessage, lastMessage }: ChatInputProps) {
                     </PopoverContent>
                 </Popover>
 
-                <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept="image/*,video/*" />
+                <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept="image/*,video/*,audio/*" />
             </div>
         </div>
         <Button onClick={handleSend} size="icon" className="h-10 w-10 shrink-0" disabled={!message.trim() || isProcessing}>

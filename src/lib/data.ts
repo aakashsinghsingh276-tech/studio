@@ -12,7 +12,7 @@ export type LocationAttachment = {
 
 export type Attachment = {
   id:string;
-  type: 'image' | 'video' | 'location' | 'contact';
+  type: 'image' | 'video' | 'audio' | 'location' | 'contact';
   url?: string;
   name?: string;
   size?: number;
@@ -41,7 +41,7 @@ export type Chat = {
 };
 
 export type Status = {
-  type: 'image' | 'text';
+  type: 'image' | 'text' | 'video' | 'audio';
   url?: string;
   content?: string;
   duration?: number;
@@ -110,11 +110,11 @@ export const calls: Call[] = [
     { id: 'call6', userId: 'user7', type: 'incoming', callType: 'audio', timestamp: 'Tuesday, 9:00 AM', duration: '1m 5s' },
   ];
 
-const generateStory = (user: User, statuses: {type: 'image' | 'text', content: string, viewed: boolean, timestamp: string}[]) => ({
+const generateStory = (user: User, statuses: {type: 'image' | 'text' | 'video' | 'audio', content: string, viewed: boolean, timestamp: string}[]) => ({
     userId: user.id,
     stories: statuses.map(s => ({
         type: s.type,
-        url: s.type === 'image' ? `https://picsum.photos/seed/${s.content}/1080/1920` : undefined,
+        url: s.type === 'image' || s.type === 'video' ? `https://picsum.photos/seed/${s.content}/1080/1920` : undefined,
         content: s.type === 'text' ? s.content : undefined,
         duration: 5000,
         timestamp: s.timestamp,

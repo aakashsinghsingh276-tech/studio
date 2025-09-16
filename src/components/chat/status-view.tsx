@@ -24,19 +24,27 @@ function StatusUploader({ onStatusUploaded }: { onStatusUploaded: (newStory: Sto
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file && me) {
-      if (!file.type.startsWith("image/")) {
+      let fileType: 'image' | 'video' | 'audio' | 'text' = 'image';
+      if (file.type.startsWith("image/")) {
+        fileType = 'image';
+      } else if (file.type.startsWith("video/")) {
+        fileType = 'video';
+      } else if (file.type.startsWith("audio/")) {
+        fileType = 'audio';
+      } else {
         toast({
           variant: "destructive",
           title: "Invalid File Type",
-          description: "Please upload an image for your status.",
+          description: "Please upload an image, video, or audio file for your status.",
         });
         return;
       }
+
       const reader = new FileReader();
       reader.onload = (e) => {
         const url = e.target?.result as string;
         const newStatus: Status = {
-          type: 'image',
+          type: fileType,
           url,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           viewed: false,
@@ -45,7 +53,7 @@ function StatusUploader({ onStatusUploaded }: { onStatusUploaded: (newStory: Sto
             subheading: 'Just now',
             profileImage: me.avatar.startsWith('http') ? me.avatar : `https://picsum.photos/seed/${me.avatar}/200/200`
           },
-          duration: 5000,
+          duration: fileType === 'video' ? undefined : (fileType === 'audio' ? undefined : 5000),
         };
 
         const myExistingStory = stories.find(s => s.userId === loggedInUserId);
@@ -80,7 +88,7 @@ function StatusUploader({ onStatusUploaded }: { onStatusUploaded: (newStory: Sto
         type="file"
         ref={fileInputRef}
         onChange={handleFileChange}
-        accept="image/*"
+        accept="image/*,video/*,audio/*"
         className="hidden"
       />
       <Button size="icon" className="absolute -bottom-2 -right-2 h-6 w-6 rounded-full bg-primary hover:bg-primary/90" onClick={handleUploadClick}>

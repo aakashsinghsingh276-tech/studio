@@ -1,7 +1,7 @@
 
 import { cn } from "@/lib/utils";
 import type { Message, User } from "@/lib/data";
-import { Check, CheckCheck, MoreVertical, Trash2, Download, MapPin } from 'lucide-react';
+import { Check, CheckCheck, MoreVertical, Trash2, Download, MapPin, Music, Film } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -72,6 +72,42 @@ export function MessageBubble({ message, isSender, onDelete }: MessageBubbleProp
           </Card>
         );
 
+      case 'video':
+        return (
+          <Card className="overflow-hidden border-none">
+            <CardContent className="p-0 relative">
+              {message.attachment.url && (
+                <video src={message.attachment.url} controls className="w-full" />
+              )}
+            </CardContent>
+            {message.content && (
+              <CardFooter className="p-2 bg-background/50">
+                <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+              </CardFooter>
+            )}
+          </Card>
+        );
+
+      case 'audio':
+        return (
+          <Card className="overflow-hidden border-none">
+            <CardContent className="p-4 flex items-center gap-4">
+              <Music className="h-8 w-8 text-primary" />
+              <div className="flex-1">
+                <p className="text-sm font-semibold truncate">{message.attachment.name}</p>
+                {message.attachment.url && (
+                  <audio src={message.attachment.url} controls className="w-full h-10 mt-1" />
+                )}
+              </div>
+            </CardContent>
+             {message.content && (
+              <CardFooter className="p-2 bg-background/50">
+                <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+              </CardFooter>
+            )}
+          </Card>
+        );
+      
       case 'location':
         return (
             <Card className="overflow-hidden border-none">
