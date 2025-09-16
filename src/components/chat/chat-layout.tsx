@@ -3,6 +3,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   MoreVertical,
   Palette,
@@ -54,6 +55,12 @@ function LeftPanel({
   chats: Chat[];
 }) {
   const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
+
+  const handleLogout = () => {
+    localStorage.removeItem("loggedIn");
+    router.push("/login");
+  };
 
   return (
     <>
@@ -113,7 +120,7 @@ function LeftPanel({
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Logout</span>
               </DropdownMenuItem>
