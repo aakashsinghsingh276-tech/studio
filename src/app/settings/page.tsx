@@ -3,7 +3,24 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, ChevronRight, Palette, UserCircle } from "lucide-react";
+import { 
+    ArrowLeft, 
+    ChevronRight, 
+    Palette, 
+    UserCircle,
+    Lock,
+    ShieldCheck,
+    Smartphone,
+    FileText,
+    Trash2,
+    Wallpaper,
+    MessageSquare,
+    Bell,
+    Database,
+    Languages,
+    HelpCircle,
+    UserPlus
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,6 +33,18 @@ import {
 import { ThemeSubMenu } from "@/components/theme-toggle";
 import { UserAvatar } from "@/components/chat/user-avatar";
 import { users, loggedInUserId } from "@/lib/data";
+import { Separator } from "@/components/ui/separator";
+
+
+const SettingsItem = ({ icon, text, hasNav = true }: { icon: React.ElementType, text: string, hasNav?: boolean }) => (
+    <div className="flex items-center justify-between p-4 rounded-lg hover:bg-secondary cursor-pointer">
+        <div className="flex items-center gap-4">
+            {React.createElement(icon, { className: "h-6 w-6 text-muted-foreground" })}
+            <p className="font-semibold">{text}</p>
+        </div>
+        {hasNav && <ChevronRight className="h-5 w-5 text-muted-foreground" />}
+    </div>
+);
 
 
 export default function SettingsPage() {
@@ -39,29 +68,38 @@ export default function SettingsPage() {
         <div className="mx-auto max-w-2xl space-y-8">
             <Card>
                 <CardHeader>
-                    <CardTitle>Profile</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <Link href="/avatar-studio">
-                        <div className="flex items-center justify-between p-4 rounded-lg hover:bg-secondary cursor-pointer">
-                            <div className="flex items-center gap-4">
-                                <UserCircle className="h-6 w-6 text-muted-foreground" />
-                                <p className="font-semibold">Avatar</p>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                {me && <UserAvatar user={me} className="h-8 w-8" />}
-                                <ChevronRight className="h-5 w-5 text-muted-foreground" />
-                            </div>
+                    <div className="flex items-center gap-4">
+                        {me && <UserAvatar user={me} className="h-16 w-16" />}
+                        <div>
+                            <p className="text-xl font-bold">{me?.name}</p>
+                            <p className="text-muted-foreground">{me?.status}</p>
                         </div>
-                    </Link>
-                </CardContent>
+                    </div>
+                </CardHeader>
             </Card>
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Appearance</CardTitle>
+                    <CardTitle>Account</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-0">
+                    <SettingsItem icon={Lock} text="Privacy" />
+                    <Separator />
+                    <SettingsItem icon={ShieldCheck} text="Security" />
+                    <Separator />
+                    <SettingsItem icon={Smartphone} text="Change number" />
+                    <Separator />
+                    <SettingsItem icon={FileText} text="Request account info" />
+                     <Separator />
+                    <SettingsItem icon={Trash2} text="Delete account" />
+                </CardContent>
+            </Card>
+
+             <Card>
+                <CardHeader>
+                    <CardTitle>Chats</CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <div className="flex items-center justify-between p-4 rounded-lg hover:bg-secondary cursor-pointer">
@@ -76,11 +114,50 @@ export default function SettingsPage() {
                           <ThemeSubMenu />
                       </DropdownMenuContent>
                     </DropdownMenu>
+                    <Separator />
+                    <SettingsItem icon={Wallpaper} text="Wallpaper" />
+                    <Separator />
+                    <SettingsItem icon={MessageSquare} text="Chat history" />
+                </CardContent>
+            </Card>
+            
+            <Card>
+                <CardHeader>
+                    <CardTitle>Notifications</CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                    <SettingsItem icon={Bell} text="Message, group & call tones" />
                 </CardContent>
             </Card>
 
+            <Card>
+                <CardHeader>
+                    <CardTitle>Storage & Data</CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                    <SettingsItem icon={Database} text="Manage storage" />
+                </CardContent>
+            </Card>
+            
+            <Card>
+                <CardHeader>
+                    <CardTitle>Help</CardTitle>
+                </CardHeader>
+                <CardContent className="p-0">
+                    <SettingsItem icon={HelpCircle} text="Help center" />
+                    <Separator />
+                    <SettingsItem icon={FileText} text="Terms and Privacy Policy" />
+                </CardContent>
+            </Card>
+
+            <Card>
+                 <CardContent className="p-0">
+                    <SettingsItem icon={UserPlus} text="Invite a friend" />
+                </CardContent>
+            </Card>
         </div>
       </main>
     </div>
   );
 }
+
