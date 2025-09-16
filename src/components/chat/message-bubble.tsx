@@ -1,7 +1,7 @@
 
 import { cn } from "@/lib/utils";
 import type { Message } from "@/lib/data";
-import { Check, CheckCheck, MoreVertical, Trash2 } from 'lucide-react';
+import { Check, CheckCheck, MoreVertical, Trash2, Download } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,6 +9,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "../ui/button";
+import Image from "next/image";
+import { Card, CardContent, CardFooter } from "../ui/card";
 
 type MessageBubbleProps = {
   message: Message;
@@ -17,6 +19,17 @@ type MessageBubbleProps = {
 };
 
 export function MessageBubble({ message, isSender, onDelete }: MessageBubbleProps) {
+  const handleDownload = () => {
+    if (message.attachment) {
+      const link = document.createElement('a');
+      link.href = message.attachment.url;
+      link.download = message.attachment.name || 'download';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  }
+
   return (
     <div className={cn("flex w-full group", isSender ? "justify-end" : "justify-start")}>
        <div className={cn("flex items-center gap-2", isSender ? "flex-row-reverse" : "flex-row")}>
@@ -25,18 +38,56 @@ export function MessageBubble({ message, isSender, onDelete }: MessageBubbleProp
             "max-w-[75%] rounded-lg px-4 py-2 flex flex-col shadow-sm",
             isSender
                 ? "bg-primary text-primary-foreground"
-                : "bg-card"
+                : "bg-card",
+            message.attachment && "p-0" // No padding for attachment messages
             )}
         >
-            <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-            <div className="flex items-center justify-end gap-2 mt-1 self-end">
-                <span className="text-xs opacity-70">
-                {message.timestamp}
-                </span>
-                {isSender && (
-                    message.read ? <CheckCheck className="h-4 w-4" /> : <Check className="h-4 w-4" />
-                )}
-            </div>
+            {message.attachment ? (
+              <Card className="overflow-hidden border-none">
+                <CardContent className="p-0">
+                  {message.attachment.type === 'image' && (
+                    <Image 
+                      src={message.attachment.url} 
+                      alt={message.attachment.name || 'attachment'} 
+                      width={300} 
+                      height={200}
+                      className="object-cover w-full h-auto"
+                    />
+                  )}
+                  {/* TODO: Add video player for video attachments */}
+                </CardContent>
+                <CardFooter className="p-2 flex flex-col items-start gap-2">
+                  {message.content && (
+                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                  )}
+                  {message.attachment.description && (
+                     <p className="text-xs italic text-muted-foreground bg-accent/20 p-2 rounded-md">
+                        {message.attachment.description}
+                    </p>
+                  )}
+                  <div className="flex items-center justify-end gap-2 mt-1 self-end w-full">
+                      <span className="text-xs opacity-70">
+                      {message.timestamp}
+                      </span>
+                      {isSender && (
+                          message.read ? <CheckCheck className="h-4 w-4" /> : <Check className="h-4 w-4" />
+                      )}
+                  </div>
+                </CardFooter>
+              </Card>
+            ) : (
+                <>
+                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                    <div className="flex items-center justify-end gap-2 mt-1 self-end">
+                        <span className="text-xs opacity-70">
+                        {message.timestamp}
+                        </span>
+                        {isSender && (
+                            message.read ? <CheckCheck className="h-4 w-4" /> : <Check className="h-4 w-4" />
+                        )}
+                    </div>
+                </>
+            )}
         </div>
         
         <DropdownMenu>
@@ -46,6 +97,12 @@ export function MessageBubble({ message, isSender, onDelete }: MessageBubbleProp
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align={isSender ? "end" : "start"}>
+                {message.attachment && (
+                  <DropdownMenuItem onClick={handleDownload}>
+                    <Download className="mr-2 h-4 w-4" />
+                    Download
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem onClick={onDelete} className="text-destructive">
                     <Trash2 className="mr-2 h-4 w-4" />
                     Delete

@@ -16,7 +16,7 @@ import { UserAvatar } from "./user-avatar";
 import { MessageList } from "./message-list";
 import { ChatInput } from "./chat-input";
 import { cn } from "@/lib/utils";
-import type { Chat, User, Message as MessageType } from "@/lib/data";
+import type { Chat, User, Message as MessageType, Attachment } from "@/lib/data";
 import { users, loggedInUserId } from "@/lib/data";
 import {
   DropdownMenu,
@@ -40,14 +40,15 @@ export function ChatView({ chat, onBack }: ChatViewProps) {
 
   const partner = getChatPartner(chat);
 
-  const handleSendMessage = (message: string) => {
+  const handleSendMessage = (content: string, attachment?: Attachment) => {
     const newMessage: MessageType = {
       id: `msg${Date.now()}`,
       chatId: chat.id,
       senderId: loggedInUserId,
-      content: message,
+      content,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       read: false,
+      attachment,
     };
     setMessages((prev) => [...prev, newMessage]);
   };

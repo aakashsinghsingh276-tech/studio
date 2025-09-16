@@ -5,6 +5,15 @@ export type User = {
   status: 'online' | 'offline';
 };
 
+export type Attachment = {
+  id: string;
+  type: 'image' | 'video';
+  url: string;
+  name?: string;
+  size?: number;
+  description?: string;
+};
+
 export type Message = {
   id: string;
   chatId: string;
@@ -12,6 +21,7 @@ export type Message = {
   content: string;
   timestamp: string;
   read: boolean;
+  attachment?: Attachment;
 };
 
 export type Chat = {
