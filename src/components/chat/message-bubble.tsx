@@ -76,13 +76,13 @@ export function MessageBubble({ message, isSender, onDelete }: MessageBubbleProp
         return (
             <Card className="overflow-hidden border-none">
                 <CardContent className="p-4 flex flex-col items-center gap-2">
-                    <MapPin className="h-10 w-10 text-primary" />
-                    <p className="font-semibold">Location Shared</p>
+                    <MapPin className={cn("h-10 w-10 text-primary", message.attachment.isLive && "text-red-500 animate-pulse")} />
+                    <p className="font-semibold">{message.attachment.isLive ? "Live Location" : "Location Shared"}</p>
                     <Button onClick={handleOpenMap} variant="outline" size="sm">
                         View on Map
                     </Button>
                 </CardContent>
-                {message.content && message.content !== "Shared my location" && (
+                {message.content && !message.content.includes("my location") && (
                      <CardFooter className="p-2 bg-background/50">
                         <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                     </CardFooter>

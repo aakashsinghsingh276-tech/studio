@@ -19,6 +19,7 @@ export type Attachment = {
   description?: string;
   location?: LocationAttachment;
   contact?: User;
+  isLive?: boolean;
 };
 
 export type Message = {

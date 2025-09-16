@@ -96,7 +96,7 @@ export function ChatInput({ onSendMessage, lastMessage }: ChatInputProps) {
     }
   };
 
-  const handleShareLocation = () => {
+  const handleShareLocation = (isLive = false) => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -105,8 +105,9 @@ export function ChatInput({ onSendMessage, lastMessage }: ChatInputProps) {
             id: uuidv4(),
             type: "location",
             location: { latitude, longitude },
+            isLive,
           };
-          onSendMessage("Shared my location", newAttachment);
+          onSendMessage(isLive ? "Sharing live location" : "Shared my location", newAttachment);
         },
         (error) => {
           console.error("Error getting location:", error);
@@ -186,7 +187,11 @@ export function ChatInput({ onSendMessage, lastMessage }: ChatInputProps) {
                                 <Contact className="mr-2 h-4 w-4" />
                                 Contact
                             </Button>
-                            <Button variant="ghost" className="justify-start" onClick={handleShareLocation}>
+                            <Button variant="ghost" className="justify-start" onClick={() => handleShareLocation(true)}>
+                                <MapPin className="mr-2 h-4 w-4 animate-pulse text-red-500" />
+                                Live Location
+                            </Button>
+                             <Button variant="ghost" className="justify-start" onClick={() => handleShareLocation(false)}>
                                 <MapPin className="mr-2 h-4 w-4" />
                                 Location
                             </Button>
