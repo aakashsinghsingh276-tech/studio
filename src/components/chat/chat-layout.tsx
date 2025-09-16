@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, MoreVertical } from "lucide-react";
+import { Search, MoreVertical, Send } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChatList } from "./chat-list";
 import { ChatView } from "./chat-view";
