@@ -10,6 +10,7 @@ import { type Message, type Attachment } from "@/lib/data";
 import { loggedInUserId } from "@/lib/data";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { useToast } from "@/hooks/use-toast";
+import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
 
 type ChatInputProps = {
   onSendMessage: (message: string, attachment?: Attachment) => void;
@@ -131,6 +132,10 @@ export function ChatInput({ onSendMessage, lastMessage }: ChatInputProps) {
       // TODO: Implement contact sharing logic
       alert("Contact sharing is not implemented yet.");
   }
+  
+  const handleEmojiClick = (emojiData: EmojiClickData) => {
+    setMessage(prevMessage => prevMessage + emojiData.emoji);
+  };
 
   const isProcessing = isAISuggesting || isAIDescribing;
 
@@ -198,9 +203,17 @@ export function ChatInput({ onSendMessage, lastMessage }: ChatInputProps) {
                         </div>
                     </PopoverContent>
                 </Popover>
-                <Button variant="ghost" size="icon" disabled={isProcessing}>
-                    <Smile className="h-5 w-5 text-muted-foreground" />
-                </Button>
+                <Popover>
+                    <PopoverTrigger asChild>
+                        <Button variant="ghost" size="icon" disabled={isProcessing}>
+                            <Smile className="h-5 w-5 text-muted-foreground" />
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0 border-0">
+                        <EmojiPicker onEmojiClick={handleEmojiClick} />
+                    </PopoverContent>
+                </Popover>
+
                 <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept="image/*,video/*" />
             </div>
         </div>
