@@ -34,6 +34,24 @@ export function ThemeToggle() {
         <DropdownMenuItem onClick={() => setTheme("system")}>
           System
         </DropdownMenuItem>
+         <DropdownMenuItem onClick={() => setTheme("light-mint")}>
+          Mint (Light)
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme("dark-mint")}>
+          Mint (Dark)
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme("light-sky")}>
+          Sky (Light)
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme("dark-sky")}>
+          Sky (Dark)
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme("light-rose")}>
+          Rose (Light)
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme("dark-rose")}>
+          Rose (Dark)
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )
@@ -51,6 +69,24 @@ export function ThemeSubMenu() {
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setTheme("system")}>
                 System
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTheme("light-mint")}>
+              Mint (Light)
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTheme("dark-mint")}>
+              Mint (Dark)
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTheme("light-sky")}>
+              Sky (Light)
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTheme("dark-sky")}>
+              Sky (Dark)
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTheme("light-rose")}>
+              Rose (Light)
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTheme("dark-rose")}>
+              Rose (Dark)
             </DropdownMenuItem>
         </>
     )
