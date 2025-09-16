@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -65,8 +66,10 @@ export function ChatView({ chat, onBack }: ChatViewProps) {
               <Video className="h-5 w-5 text-muted-foreground" />
             </Link>
           </Button>
-          <Button variant="ghost" size="icon">
-            <Phone className="h-5 w-5 text-muted-foreground" />
+          <Button variant="ghost" size="icon" asChild>
+            <Link href={`/audio/${chat.id}`}>
+              <Phone className="h-5 w-5 text-muted-foreground" />
+            </Link>
           </Button>
           <Button variant="ghost" size="icon">
             <MoreVertical className="h-5 w-5 text-muted-foreground" />
