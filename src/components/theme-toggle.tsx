@@ -52,6 +52,12 @@ export function ThemeToggle() {
         <DropdownMenuItem onClick={() => setTheme("dark-rose")}>
           Rose (Dark)
         </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme("light-pikachu")}>
+          Pikachu (Light)
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme("dark-pikachu")}>
+          Pikachu (Dark)
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )
@@ -87,6 +93,12 @@ export function ThemeSubMenu() {
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setTheme("dark-rose")}>
               Rose (Dark)
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTheme("light-pikachu")}>
+              Pikachu (Light)
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTheme("dark-pikachu")}>
+              Pikachu (Dark)
             </DropdownMenuItem>
         </>
     )
