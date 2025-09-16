@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
   ArrowLeft,
@@ -59,8 +60,10 @@ export function ChatView({ chat, onBack }: ChatViewProps) {
           </div>
         </div>
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon">
-            <Video className="h-5 w-5 text-muted-foreground" />
+          <Button variant="ghost" size="icon" asChild>
+            <Link href={`/video/${chat.id}`}>
+              <Video className="h-5 w-5 text-muted-foreground" />
+            </Link>
           </Button>
           <Button variant="ghost" size="icon">
             <Phone className="h-5 w-5 text-muted-foreground" />
