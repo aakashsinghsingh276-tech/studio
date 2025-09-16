@@ -12,7 +12,8 @@ import {
   Settings,
   Star,
   Users,
-  UserPlus
+  UserPlus,
+  LogOut,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -110,6 +111,11 @@ function LeftPanel({
                   <Settings className="mr-2 h-4 w-4" />
                   <span>Settings</span>
                 </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Logout</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
