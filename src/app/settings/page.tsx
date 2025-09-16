@@ -94,7 +94,7 @@ export default function SettingsPage() {
                 <CardContent className="p-0">
                     <SettingsItem icon={Lock} text="Privacy" href="/settings/privacy" />
                     <Separator />
-                    <SettingsItem icon={ShieldCheck} text="Security" />
+                    <SettingsItem icon={ShieldCheck} text="Security" href="/settings/security" />
                     <Separator />
                     <SettingsItem icon={Smartphone} text="Change number" />
                     <Separator />
