@@ -5,13 +5,20 @@ export type User = {
   status: 'online' | 'offline';
 };
 
+export type LocationAttachment = {
+  latitude: number;
+  longitude: number;
+};
+
 export type Attachment = {
-  id: string;
-  type: 'image' | 'video';
-  url: string;
+  id:string;
+  type: 'image' | 'video' | 'location' | 'contact';
+  url?: string;
   name?: string;
   size?: number;
   description?: string;
+  location?: LocationAttachment;
+  contact?: User;
 };
 
 export type Message = {

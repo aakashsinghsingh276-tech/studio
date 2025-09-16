@@ -1,7 +1,7 @@
 
 import { cn } from "@/lib/utils";
-import type { Message } from "@/lib/data";
-import { Check, CheckCheck, MoreVertical, Trash2, Download } from 'lucide-react';
+import type { Message, User } from "@/lib/data";
+import { Check, CheckCheck, MoreVertical, Trash2, Download, MapPin } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,6 +11,7 @@ import {
 import { Button } from "../ui/button";
 import Image from "next/image";
 import { Card, CardContent, CardFooter } from "../ui/card";
+import { UserAvatar } from "./user-avatar";
 
 type MessageBubbleProps = {
   message: Message;
@@ -20,7 +21,7 @@ type MessageBubbleProps = {
 
 export function MessageBubble({ message, isSender, onDelete }: MessageBubbleProps) {
   const handleDownload = () => {
-    if (message.attachment) {
+    if (message.attachment && message.attachment.url) {
       const link = document.createElement('a');
       link.href = message.attachment.url;
       link.download = message.attachment.name || 'download';
@@ -30,64 +31,110 @@ export function MessageBubble({ message, isSender, onDelete }: MessageBubbleProp
     }
   }
 
+  const handleOpenMap = () => {
+    if (message.attachment?.type === 'location' && message.attachment.location) {
+        const { latitude, longitude } = message.attachment.location;
+        const url = `https://www.google.com/maps?q=${latitude},${longitude}`;
+        window.open(url, '_blank');
+    }
+  };
+
+  const renderAttachment = () => {
+    if (!message.attachment) return null;
+
+    switch (message.attachment.type) {
+      case 'image':
+        return (
+          <Card className="overflow-hidden border-none">
+            <CardContent className="p-0 relative">
+              {message.attachment.url && (
+                <Image 
+                  src={message.attachment.url} 
+                  alt={message.attachment.name || 'attachment'} 
+                  width={300} 
+                  height={200}
+                  className="object-cover w-full h-auto"
+                />
+              )}
+            </CardContent>
+            {(message.content || message.attachment.description) && (
+              <CardFooter className="p-2 flex flex-col items-start gap-2 bg-background/50">
+                {message.content && (
+                  <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                )}
+                {message.attachment.description && (
+                   <p className="text-xs italic text-muted-foreground bg-accent/20 p-2 rounded-md">
+                      {message.attachment.description}
+                  </p>
+                )}
+              </CardFooter>
+            )}
+          </Card>
+        );
+
+      case 'location':
+        return (
+            <Card className="overflow-hidden border-none">
+                <CardContent className="p-4 flex flex-col items-center gap-2">
+                    <MapPin className="h-10 w-10 text-primary" />
+                    <p className="font-semibold">Location Shared</p>
+                    <Button onClick={handleOpenMap} variant="outline" size="sm">
+                        View on Map
+                    </Button>
+                </CardContent>
+                {message.content && message.content !== "Shared my location" && (
+                     <CardFooter className="p-2 bg-background/50">
+                        <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                    </CardFooter>
+                )}
+            </Card>
+        )
+
+      case 'contact':
+          if (!message.attachment.contact) return null;
+          const contact = message.attachment.contact as User;
+        return (
+            <Card className="overflow-hidden border-none">
+                <CardContent className="p-4 flex items-center gap-4">
+                    <UserAvatar user={contact} />
+                    <div>
+                        <p className="font-semibold">{contact.name}</p>
+                        <p className="text-sm text-muted-foreground">Contact</p>
+                    </div>
+                </CardContent>
+            </Card>
+        )
+
+      default:
+        return null;
+    }
+  };
+
+
   return (
     <div className={cn("flex w-full group", isSender ? "justify-end" : "justify-start")}>
-       <div className={cn("flex items-center gap-2", isSender ? "flex-row-reverse" : "flex-row")}>
+       <div className={cn("flex items-end gap-2", isSender ? "flex-row-reverse" : "flex-row")}>
         <div
             className={cn(
             "max-w-[75%] rounded-lg px-4 py-2 flex flex-col shadow-sm",
             isSender
                 ? "bg-primary text-primary-foreground"
                 : "bg-card",
-            message.attachment && "p-0" // No padding for attachment messages
+            message.attachment && "p-0"
             )}
         >
-            {message.attachment ? (
-              <Card className="overflow-hidden border-none">
-                <CardContent className="p-0">
-                  {message.attachment.type === 'image' && (
-                    <Image 
-                      src={message.attachment.url} 
-                      alt={message.attachment.name || 'attachment'} 
-                      width={300} 
-                      height={200}
-                      className="object-cover w-full h-auto"
-                    />
-                  )}
-                  {/* TODO: Add video player for video attachments */}
-                </CardContent>
-                <CardFooter className="p-2 flex flex-col items-start gap-2">
-                  {message.content && (
-                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                  )}
-                  {message.attachment.description && (
-                     <p className="text-xs italic text-muted-foreground bg-accent/20 p-2 rounded-md">
-                        {message.attachment.description}
-                    </p>
-                  )}
-                  <div className="flex items-center justify-end gap-2 mt-1 self-end w-full">
-                      <span className="text-xs opacity-70">
-                      {message.timestamp}
-                      </span>
-                      {isSender && (
-                          message.read ? <CheckCheck className="h-4 w-4" /> : <Check className="h-4 w-4" />
-                      )}
-                  </div>
-                </CardFooter>
-              </Card>
-            ) : (
-                <>
-                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                    <div className="flex items-center justify-end gap-2 mt-1 self-end">
-                        <span className="text-xs opacity-70">
-                        {message.timestamp}
-                        </span>
-                        {isSender && (
-                            message.read ? <CheckCheck className="h-4 w-4" /> : <Check className="h-4 w-4" />
-                        )}
-                    </div>
-                </>
+            {message.attachment ? renderAttachment() : (
+                <p className="text-sm whitespace-pre-wrap">{message.content}</p>
             )}
+
+            <div className={cn("flex items-center justify-end gap-2 mt-1 self-end", message.attachment && "p-2 pt-0")}>
+                <span className="text-xs opacity-70">
+                {message.timestamp}
+                </span>
+                {isSender && (
+                    message.read ? <CheckCheck className="h-4 w-4" /> : <Check className="h-4 w-4" />
+                )}
+            </div>
         </div>
         
         <DropdownMenu>
@@ -97,7 +144,7 @@ export function MessageBubble({ message, isSender, onDelete }: MessageBubbleProp
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align={isSender ? "end" : "start"}>
-                {message.attachment && (
+                {message.attachment && message.attachment.url && (
                   <DropdownMenuItem onClick={handleDownload}>
                     <Download className="mr-2 h-4 w-4" />
                     Download

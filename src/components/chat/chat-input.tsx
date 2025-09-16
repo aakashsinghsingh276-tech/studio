@@ -4,10 +4,12 @@ import { useState, useEffect, useTransition, useRef } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Paperclip, Send, Smile, Loader2 } from "lucide-react";
+import { Paperclip, Send, Smile, Loader2, Image as ImageIcon, Contact, MapPin } from "lucide-react";
 import { generateSmartReplies, describeImage } from "@/actions/ai-actions";
 import { type Message, type Attachment } from "@/lib/data";
 import { loggedInUserId } from "@/lib/data";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { useToast } from "@/hooks/use-toast";
 
 type ChatInputProps = {
   onSendMessage: (message: string, attachment?: Attachment) => void;
@@ -19,6 +21,7 @@ export function ChatInput({ onSendMessage, lastMessage }: ChatInputProps) {
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [isAISuggesting, startSmartReplyTransition] = useTransition();
   const [isAIDescribing, startImageDescribeTransition] = useTransition();
+  const { toast } = useToast();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -93,6 +96,41 @@ export function ChatInput({ onSendMessage, lastMessage }: ChatInputProps) {
     }
   };
 
+  const handleShareLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          const newAttachment: Attachment = {
+            id: uuidv4(),
+            type: "location",
+            location: { latitude, longitude },
+          };
+          onSendMessage("Shared my location", newAttachment);
+        },
+        (error) => {
+          console.error("Error getting location:", error);
+          toast({
+            variant: "destructive",
+            title: "Location Error",
+            description: "Could not retrieve your location. Please ensure you've granted permission.",
+          });
+        }
+      );
+    } else {
+        toast({
+            variant: "destructive",
+            title: "Location Error",
+            description: "Geolocation is not supported by your browser.",
+          });
+    }
+  };
+
+  const handleShareContact = () => {
+      // TODO: Implement contact sharing logic
+      alert("Contact sharing is not implemented yet.");
+  }
+
   const isProcessing = isAISuggesting || isAIDescribing;
 
   return (
@@ -132,9 +170,29 @@ export function ChatInput({ onSendMessage, lastMessage }: ChatInputProps) {
                 disabled={isProcessing}
             />
             <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
-                <Button variant="ghost" size="icon" onClick={handleAttachmentClick} disabled={isProcessing}>
-                    <Paperclip className="h-5 w-5 text-muted-foreground" />
-                </Button>
+                 <Popover>
+                    <PopoverTrigger asChild>
+                        <Button variant="ghost" size="icon" disabled={isProcessing}>
+                            <Paperclip className="h-5 w-5 text-muted-foreground" />
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-2">
+                        <div className="flex flex-col gap-2">
+                            <Button variant="ghost" className="justify-start" onClick={handleAttachmentClick}>
+                                <ImageIcon className="mr-2 h-4 w-4" />
+                                Image & Video
+                            </Button>
+                            <Button variant="ghost" className="justify-start" onClick={handleShareContact}>
+                                <Contact className="mr-2 h-4 w-4" />
+                                Contact
+                            </Button>
+                            <Button variant="ghost" className="justify-start" onClick={handleShareLocation}>
+                                <MapPin className="mr-2 h-4 w-4" />
+                                Location
+                            </Button>
+                        </div>
+                    </PopoverContent>
+                </Popover>
                 <Button variant="ghost" size="icon" disabled={isProcessing}>
                     <Smile className="h-5 w-5 text-muted-foreground" />
                 </Button>
