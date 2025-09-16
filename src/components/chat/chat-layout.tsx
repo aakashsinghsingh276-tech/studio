@@ -1,69 +1,94 @@
 "use client";
 
 import { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Search, MoreVertical, Send, Users, Phone, Star } from "lucide-react";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  MoreVertical,
+  Phone,
+  Search,
+  Send,
+  Settings,
+  Star,
+  Users,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import type { Chat } from "@/lib/data";
+import { chats, loggedInUserId, users } from "@/lib/data";
+import { cn } from "@/lib/utils";
+import { Button } from "../ui/button";
 import { ChatList } from "./chat-list";
 import { ChatView } from "./chat-view";
 import { StatusView } from "./status-view";
-import { cn } from "@/lib/utils";
-import type { Chat } from "@/lib/data";
-import { chats, users, loggedInUserId } from "@/lib/data";
 import { UserAvatar } from "./user-avatar";
+import { ThemeSubMenu } from "../theme-toggle";
 
-const me = users.find(u => u.id === loggedInUserId);
+const me = users.find((u) => u.id === loggedInUserId);
 
-function LeftPanel({ 
-    activeTab, 
-    setActiveTab, 
-    onSelectChat, 
-    selectedChatId 
-}: { 
-    activeTab: string, 
-    setActiveTab: (tab: string) => void, 
-    onSelectChat: (chat: Chat) => void, 
-    selectedChatId: string | null 
+function LeftPanel({
+  activeTab,
+  setActiveTab,
+  onSelectChat,
+  selectedChatId,
+}: {
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
+  onSelectChat: (chat: Chat) => void;
+  selectedChatId: string | null;
 }) {
   return (
     <>
       <header className="flex items-center justify-between border-b bg-card p-3">
         {me && <UserAvatar user={me} />}
         <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold">ChatOn</h1>
+          <h1 className="text-xl font-bold">ChatOn</h1>
         </div>
         <div className="flex items-center gap-1">
-            <Button variant="ghost" size="icon">
-                <Search className="h-5 w-5 text-muted-foreground" />
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <MoreVertical className="h-5 w-5 text-muted-foreground" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem>
-                  <Star className="mr-2 h-4 w-4" />
-                  <span>Avatar Studio</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Phone className="mr-2 h-4 w-4" />
-                  <span>Calls</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Users className="mr-2 h-4 w-4" />
-                  <span>Contacts</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+          <Button variant="ghost" size="icon">
+            <Search className="h-5 w-5 text-muted-foreground" />
+          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <MoreVertical className="h-5 w-5 text-muted-foreground" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem>
+                <Star className="mr-2 h-4 w-4" />
+                <span>Avatar Studio</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Phone className="mr-2 h-4 w-4" />
+                <span>Calls</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Users className="mr-2 h-4 w-4" />
+                <span>Contacts</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>Theme</span>
+                </DropdownMenuSubTrigger>
+                <DropdownMenuPortal>
+                  <DropdownMenuSubContent>
+                    <ThemeSubMenu />
+                  </DropdownMenuSubContent>
+                </DropdownMenuPortal>
+              </DropdownMenuSub>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </header>
       <div className="p-3">
@@ -99,11 +124,11 @@ export function ChatLayout() {
           selectedChat ? "hidden" : "w-full"
         )}
       >
-        <LeftPanel 
-            activeTab={activeTab} 
-            setActiveTab={setActiveTab}
-            onSelectChat={setSelectedChat}
-            selectedChatId={selectedChat?.id || null}
+        <LeftPanel
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          onSelectChat={setSelectedChat}
+          selectedChatId={selectedChat?.id || null}
         />
       </div>
       <div
@@ -117,13 +142,14 @@ export function ChatLayout() {
         ) : (
           <div className="flex h-full flex-col items-center justify-center gap-4 bg-secondary/50 text-center">
             <div className="rounded-full bg-primary/20 p-6">
-                <div className="rounded-full bg-primary/40 p-4">
-                    <Send className="h-16 w-16 text-primary" />
-                </div>
+              <div className="rounded-full bg-primary/40 p-4">
+                <Send className="h-16 w-16 text-primary" />
+              </div>
             </div>
             <h2 className="text-2xl font-bold">Welcome to ChatOn</h2>
             <p className="max-w-sm text-muted-foreground">
-              Select a chat to start messaging. Your conversations are secure and private.
+              Select a chat to start messaging. Your conversations are secure
+              and private.
             </p>
           </div>
         )}
