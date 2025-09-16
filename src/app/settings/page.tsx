@@ -37,15 +37,23 @@ import { users, loggedInUserId } from "@/lib/data";
 import { Separator } from "@/components/ui/separator";
 
 
-const SettingsItem = ({ icon, text, hasNav = true }: { icon: React.ElementType, text: string, hasNav?: boolean }) => (
-    <div className="flex items-center justify-between p-4 rounded-lg hover:bg-secondary cursor-pointer">
-        <div className="flex items-center gap-4">
-            {React.createElement(icon, { className: "h-6 w-6 text-muted-foreground" })}
-            <p className="font-semibold">{text}</p>
+const SettingsItem = ({ icon, text, hasNav = true, href }: { icon: React.ElementType, text: string, hasNav?: boolean, href?: string }) => {
+    const content = (
+        <div className="flex items-center justify-between p-4 rounded-lg hover:bg-secondary cursor-pointer">
+            <div className="flex items-center gap-4">
+                {React.createElement(icon, { className: "h-6 w-6 text-muted-foreground" })}
+                <p className="font-semibold">{text}</p>
+            </div>
+            {hasNav && <ChevronRight className="h-5 w-5 text-muted-foreground" />}
         </div>
-        {hasNav && <ChevronRight className="h-5 w-5 text-muted-foreground" />}
-    </div>
-);
+    );
+
+    if (href) {
+        return <Link href={href}>{content}</Link>;
+    }
+
+    return content;
+};
 
 
 export default function SettingsPage() {
@@ -116,7 +124,7 @@ export default function SettingsPage() {
                       </DropdownMenuContent>
                     </DropdownMenu>
                     <Separator />
-                    <SettingsItem icon={Wallpaper} text="Wallpaper" />
+                    <SettingsItem icon={Wallpaper} text="Wallpaper" href="/settings/wallpaper" />
                     <Separator />
                     <SettingsItem icon={MessageSquare} text="Chat history" />
                 </CardContent>

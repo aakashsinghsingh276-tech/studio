@@ -60,6 +60,24 @@
       "description": "Status Image 3",
       "imageUrl": "https://picsum.photos/seed/12/400/700",
       "imageHint": "abstract art"
-    }
+    },
+    { "id": "wallpaper-light-1", "description": "Light Wallpaper 1", "imageUrl": "https://picsum.photos/seed/wl1/400/700", "imageHint": "light gradient" },
+    { "id": "wallpaper-light-2", "description": "Light Wallpaper 2", "imageUrl": "https://picsum.photos/seed/wl2/400/700", "imageHint": "soft pattern" },
+    { "id": "wallpaper-light-3", "description": "Light Wallpaper 3", "imageUrl": "https://picsum.photos/seed/wl3/400/700", "imageHint": "abstract pastel" },
+    { "id": "wallpaper-light-4", "description": "Light Wallpaper 4", "imageUrl": "https://picsum.photos/seed/wl4/400/700", "imageHint": "bright nature" },
+    { "id": "wallpaper-light-5", "description": "Light Wallpaper 5", "imageUrl": "https://picsum.photos/seed/wl5/400/700", "imageHint": "minimalist white" },
+    { "id": "wallpaper-light-6", "description": "Light Wallpaper 6", "imageUrl": "https://picsum.photos/seed/wl6/400/700", "imageHint": "colorful geometric" },
+    { "id": "wallpaper-dark-1", "description": "Dark Wallpaper 1", "imageUrl": "https://picsum.photos/seed/wd1/400/700", "imageHint": "dark galaxy" },
+    { "id": "wallpaper-dark-2", "description": "Dark Wallpaper 2", "imageUrl": "https://picsum.photos/seed/wd2/400/700", "imageHint": "moody forest" },
+    { "id": "wallpaper-dark-3", "description": "Dark Wallpaper 3", "imageUrl": "https://picsum.photos/seed/wd3/400/700", "imageHint": "abstract dark" },
+    { "id": "wallpaper-dark-4", "description": "Dark Wallpaper 4", "imageUrl": "https://picsum.photos/seed/wd4/400/700", "imageHint": "dark city" },
+    { "id": "wallpaper-dark-5", "description": "Dark Wallpaper 5", "imageUrl": "https://picsum.photos/seed/wd5/400/700", "imageHint": "minimalist black" },
+    { "id": "wallpaper-dark-6", "description": "Dark Wallpaper 6", "imageUrl": "https://picsum.photos/seed/wd6/400/700", "imageHint": "deep ocean" },
+    { "id": "wallpaper-solid-1", "description": "Solid Color 1", "imageUrl": "https://placehold.co/400x700/e2e8f0/e2e8f0", "imageHint": "solid light gray" },
+    { "id": "wallpaper-solid-2", "description": "Solid Color 2", "imageUrl": "https://placehold.co/400x700/fecaca/fecaca", "imageHint": "solid light red" },
+    { "id": "wallpaper-solid-3", "description": "Solid Color 3", "imageUrl": "https://placehold.co/400x700/bbf7d0/bbf7d0", "imageHint": "solid light green" },
+    { "id": "wallpaper-solid-4", "description": "Solid Color 4", "imageUrl": "https://placehold.co/400x700/bfdbfe/bfdbfe", "imageHint": "solid light blue" },
+    { "id": "wallpaper-solid-5", "description": "Solid Color 5", "imageUrl": "https://placehold.co/400x700/27272a/27272a", "imageHint": "solid dark gray" },
+    { "id": "wallpaper-solid-6", "description": "Solid Color 6", "imageUrl": "https://placehold.co/400x700/450a0a/450a0a", "imageHint": "solid dark red" }
   ]
 }
