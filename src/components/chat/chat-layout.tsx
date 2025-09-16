@@ -77,9 +77,11 @@ function LeftPanel({
                   <span>Calls</span>
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Users className="mr-2 h-4 w-4" />
-                <span>Contacts</span>
+              <DropdownMenuItem asChild>
+                <Link href="/contacts">
+                  <Users className="mr-2 h-4 w-4" />
+                  <span>Contacts</span>
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuSub>
