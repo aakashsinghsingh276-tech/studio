@@ -16,11 +16,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuPortal,
   DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -32,7 +28,6 @@ import { ChatList } from "./chat-list";
 import { ChatView } from "./chat-view";
 import { StatusView } from "./status-view";
 import { UserAvatar } from "./user-avatar";
-import { ThemeSubMenu } from "../theme-toggle";
 import { Input } from "../ui/input";
 
 const me = users.find((u) => u.id === loggedInUserId);
@@ -84,17 +79,12 @@ function LeftPanel({
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuSub>
-                <DropdownMenuSubTrigger>
+              <DropdownMenuItem asChild>
+                <Link href="/settings">
                   <Settings className="mr-2 h-4 w-4" />
-                  <span>Theme</span>
-                </DropdownMenuSubTrigger>
-                <DropdownMenuPortal>
-                  <DropdownMenuSubContent>
-                    <ThemeSubMenu />
-                  </DropdownMenuSubContent>
-                </DropdownMenuPortal>
-              </DropdownMenuSub>
+                  <span>Settings</span>
+                </Link>
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
