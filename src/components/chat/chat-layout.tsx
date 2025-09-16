@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Chat } from "@/lib/data";
-import { chats, loggedInUserId, users } from "@/lib/data";
+import { chats as initialChats, loggedInUserId, users } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { ChatList } from "./chat-list";
@@ -43,11 +43,13 @@ function LeftPanel({
   setActiveTab,
   onSelectChat,
   selectedChatId,
+  chats,
 }: {
   activeTab: string;
   setActiveTab: (tab: string) => void;
   onSelectChat: (chat: Chat) => void;
   selectedChatId: string | null;
+  chats: Chat[];
 }) {
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -140,8 +142,19 @@ function LeftPanel({
 }
 
 export function ChatLayout() {
+  const [chats, setChats] = useState<Chat[]>(initialChats);
   const [selectedChat, setSelectedChat] = useState<Chat | null>(chats[0]);
   const [activeTab, setActiveTab] = useState("chats");
+
+  const handleSelectChat = (chat: Chat) => {
+    setSelectedChat(chat);
+    // Mark chat as read
+    setChats(prevChats => 
+      prevChats.map(c => 
+        c.id === chat.id ? { ...c, unreadCount: 0 } : c
+      )
+    );
+  };
 
   return (
     <div className="flex h-screen w-full bg-background font-body text-sm">
@@ -154,8 +167,9 @@ export function ChatLayout() {
         <LeftPanel
           activeTab={activeTab}
           setActiveTab={setActiveTab}
-          onSelectChat={setSelectedChat}
+          onSelectChat={handleSelectChat}
           selectedChatId={selectedChat?.id || null}
+          chats={chats}
         />
       </div>
       <div
