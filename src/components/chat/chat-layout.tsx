@@ -5,6 +5,7 @@ import { useState } from "react";
 import Link from "next/link";
 import {
   MoreVertical,
+  Palette,
   Phone,
   Search,
   Send,
@@ -16,7 +17,11 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuPortal,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -29,6 +34,7 @@ import { ChatView } from "./chat-view";
 import { StatusView } from "./status-view";
 import { UserAvatar } from "./user-avatar";
 import { Input } from "../ui/input";
+import { ThemeSubMenu } from "../theme-toggle";
 
 const me = users.find((u) => u.id === loggedInUserId);
 
@@ -78,6 +84,17 @@ function LeftPanel({
                   <span>Contacts</span>
                 </Link>
               </DropdownMenuItem>
+               <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <Palette className="mr-2 h-4 w-4" />
+                  <span>Theme</span>
+                </DropdownMenuSubTrigger>
+                <DropdownMenuPortal>
+                  <DropdownMenuSubContent>
+                    <ThemeSubMenu />
+                  </DropdownMenuSubContent>
+                </DropdownMenuPortal>
+              </DropdownMenuSub>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
                 <Link href="/settings">
