@@ -59,6 +59,15 @@ export type Story = {
     stories: Status[];
 }
 
+export type Call = {
+  id: string;
+  userId: string;
+  type: 'incoming' | 'outgoing' | 'missed';
+  callType: 'audio' | 'video';
+  timestamp: string;
+  duration?: string;
+};
+
 export const loggedInUserId = 'user1';
 
 export const users: User[] = [
@@ -91,6 +100,15 @@ export const chats: Chat[] = [
   { id: 'chat5', type: 'private', participants: ['user1', 'user6'], messages: messages.filter(m => m.chatId === 'chat5'), unreadCount: 0 },
   { id: 'chat6', type: 'private', participants: ['user1', 'user7'], messages: messages.filter(m => m.chatId === 'chat6'), unreadCount: 0 },
 ];
+
+export const calls: Call[] = [
+    { id: 'call1', userId: 'user2', type: 'missed', callType: 'video', timestamp: 'Today, 2:30 PM' },
+    { id: 'call2', userId: 'user3', type: 'outgoing', callType: 'audio', timestamp: 'Today, 11:15 AM', duration: '12m 34s' },
+    { id: 'call3', userId: 'user4', type: 'incoming', callType: 'audio', timestamp: 'Yesterday, 8:45 PM', duration: '5m 21s' },
+    { id: 'call4', userId: 'user5', type: 'missed', callType: 'video', timestamp: 'Yesterday, 1:00 PM' },
+    { id: 'call5', userId: 'user6', type: 'outgoing', callType: 'video', timestamp: 'Tuesday, 4:30 PM', duration: '23m 10s' },
+    { id: 'call6', userId: 'user7', type: 'incoming', callType: 'audio', timestamp: 'Tuesday, 9:00 AM', duration: '1m 5s' },
+  ];
 
 const generateStory = (user: User, statuses: {type: 'image' | 'text', content: string, viewed: boolean, timestamp: string}[]) => ({
     userId: user.id,

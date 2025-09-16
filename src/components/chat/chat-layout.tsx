@@ -71,9 +71,11 @@ function LeftPanel({
                   <span>Avatar Studio</span>
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Phone className="mr-2 h-4 w-4" />
-                <span>Calls</span>
+              <DropdownMenuItem asChild>
+                <Link href="/calls">
+                  <Phone className="mr-2 h-4 w-4" />
+                  <span>Calls</span>
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <Users className="mr-2 h-4 w-4" />
