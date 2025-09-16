@@ -92,7 +92,7 @@ export default function SettingsPage() {
                     <CardTitle>Account</CardTitle>
                 </CardHeader>
                 <CardContent className="p-0">
-                    <SettingsItem icon={Lock} text="Privacy" />
+                    <SettingsItem icon={Lock} text="Privacy" href="/settings/privacy" />
                     <Separator />
                     <SettingsItem icon={ShieldCheck} text="Security" />
                     <Separator />
