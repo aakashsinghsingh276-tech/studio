@@ -1,5 +1,7 @@
+
 "use client";
 
+import { useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { type Chat, type User, users, loggedInUserId } from "@/lib/data";
 import { UserAvatar } from "./user-avatar";
@@ -10,18 +12,31 @@ type ChatListProps = {
   chats: Chat[];
   selectedChatId: string | null;
   onSelectChat: (chat: Chat) => void;
+  searchQuery: string;
 };
 
-export function ChatList({ chats, selectedChatId, onSelectChat }: ChatListProps) {
+export function ChatList({ chats, selectedChatId, onSelectChat, searchQuery }: ChatListProps) {
   const getChatPartner = (chat: Chat): User => {
     const partnerId = chat.participants.find(p => p !== loggedInUserId);
     return users.find(u => u.id === partnerId) || users[0];
   }
 
+  const filteredChats = useMemo(() => {
+    if (!searchQuery) return chats;
+    return chats.filter(chat => {
+      const partner = getChatPartner(chat);
+      const lastMessage = chat.messages[chat.messages.length - 1];
+      return (
+        partner.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (lastMessage && lastMessage.content.toLowerCase().includes(searchQuery.toLowerCase()))
+      );
+    });
+  }, [chats, searchQuery]);
+
   return (
     <ScrollArea className="flex-1">
       <div className="flex flex-col gap-1 p-2">
-        {chats.map((chat) => (
+        {filteredChats.map((chat) => (
           <button
             key={chat.id}
             className={cn(
@@ -51,6 +66,12 @@ export function ChatList({ chats, selectedChatId, onSelectChat }: ChatListProps)
             </div>
           </button>
         ))}
+        {filteredChats.length === 0 && (
+          <div className="flex h-full flex-col items-center justify-center gap-2 p-8 text-center text-muted-foreground">
+            <p className="font-semibold">No chats found</p>
+            <p className="text-sm">Try a different search term.</p>
+          </div>
+        )}
       </div>
     </ScrollArea>
   );

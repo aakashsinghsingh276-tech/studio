@@ -33,6 +33,7 @@ import { ChatView } from "./chat-view";
 import { StatusView } from "./status-view";
 import { UserAvatar } from "./user-avatar";
 import { ThemeSubMenu } from "../theme-toggle";
+import { Input } from "../ui/input";
 
 const me = users.find((u) => u.id === loggedInUserId);
 
@@ -47,6 +48,8 @@ function LeftPanel({
   onSelectChat: (chat: Chat) => void;
   selectedChatId: string | null;
 }) {
+  const [searchQuery, setSearchQuery] = useState("");
+
   return (
     <>
       <header className="flex items-center justify-between border-b bg-card p-3">
@@ -55,9 +58,6 @@ function LeftPanel({
           <h1 className="text-xl font-bold">ChatOn</h1>
         </div>
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon">
-            <Search className="h-5 w-5 text-muted-foreground" />
-          </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon">
@@ -96,6 +96,17 @@ function LeftPanel({
         </div>
       </header>
       <div className="p-3">
+        <div className="relative">
+          <Input 
+            placeholder="Search chats or contacts..."
+            className="pl-10"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+        </div>
+      </div>
+      <div className="p-3 pt-0">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="chats">Chats</TabsTrigger>
@@ -108,6 +119,7 @@ function LeftPanel({
           chats={chats}
           selectedChatId={selectedChatId}
           onSelectChat={onSelectChat}
+          searchQuery={searchQuery}
         />
       ) : (
         <StatusView />
