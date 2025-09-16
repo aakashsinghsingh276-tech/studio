@@ -1,20 +1,102 @@
 
 "use client";
 
-import { useState } from "react";
-import { stories, users, loggedInUserId, Story } from "@/lib/data";
+import { useState, useRef } from "react";
+import { stories, users, loggedInUserId, Story, type Status } from "@/lib/data";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { UserAvatar } from "./user-avatar";
 import { Button } from "../ui/button";
 import { Camera, Plus } from "lucide-react";
 import { Card } from "../ui/card";
 import { StatusViewer } from "./status-viewer";
+import { useToast } from "@/hooks/use-toast";
+import { v4 as uuidv4 } from "uuid";
+
+function StatusUploader({ onStatusUploaded }: { onStatusUploaded: (newStory: Story) => void }) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const me = users.find(u => u.id === loggedInUserId);
+  const { toast } = useToast();
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file && me) {
+      if (!file.type.startsWith("image/")) {
+        toast({
+          variant: "destructive",
+          title: "Invalid File Type",
+          description: "Please upload an image for your status.",
+        });
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const url = e.target?.result as string;
+        const newStatus: Status = {
+          type: 'image',
+          url,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          viewed: false,
+          header: {
+            heading: me.name,
+            subheading: 'Just now',
+            profileImage: me.avatar.startsWith('http') ? me.avatar : `https://picsum.photos/seed/${me.avatar}/200/200`
+          },
+          duration: 5000,
+        };
+
+        const myExistingStory = stories.find(s => s.userId === loggedInUserId);
+        
+        let newStoryData: Story;
+
+        if (myExistingStory) {
+            myExistingStory.stories.push(newStatus);
+            newStoryData = myExistingStory;
+        } else {
+            newStoryData = {
+                userId: loggedInUserId,
+                stories: [newStatus]
+            };
+            stories.unshift(newStoryData);
+        }
+        
+        onStatusUploaded(newStoryData);
+
+        toast({
+          title: "Status Updated",
+          description: "Your new status has been uploaded.",
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  return (
+    <>
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        accept="image/*"
+        className="hidden"
+      />
+      <Button size="icon" className="absolute -bottom-2 -right-2 h-6 w-6 rounded-full bg-primary hover:bg-primary/90" onClick={handleUploadClick}>
+        <Plus className="h-4 w-4 text-primary-foreground" />
+      </Button>
+    </>
+  );
+}
+
 
 export function StatusView() {
-  const myStory = stories.find(s => s.userId === loggedInUserId);
+  const [allStories, setAllStories] = useState(stories);
   const me = users.find(u => u.id === loggedInUserId);
-  
-  const otherStories = stories.filter(s => s.userId !== loggedInUserId);
+
+  const myStory = allStories.find(s => s.userId === loggedInUserId);
+  const otherStories = allStories.filter(s => s.userId !== loggedInUserId);
   const recentUpdates = otherStories.filter(s => !s.stories.every(story => story.viewed));
   const viewedUpdates = otherStories.filter(s => s.stories.every(story => story.viewed));
 
@@ -23,13 +105,39 @@ export function StatusView() {
   const handleStoryClick = (story: Story) => {
     setViewingStory(story);
   };
+  
+  const handleMyStoryClick = () => {
+    if (myStory) {
+      setViewingStory(myStory);
+    }
+  }
 
   const handleCloseViewer = () => {
+    const storyId = viewingStory?.userId;
     setViewingStory(null);
-    // In a real app, you'd update the 'viewed' status in your backend
-    if (viewingStory) {
-      viewingStory.stories.forEach(s => s.viewed = true);
+    if (storyId) {
+      setAllStories(currentStories => 
+        currentStories.map(story => {
+          if (story.userId === storyId) {
+            return {
+              ...story,
+              stories: story.stories.map(s => ({ ...s, viewed: true }))
+            };
+          }
+          return story;
+        })
+      );
     }
+  }
+
+  const handleStatusUploaded = (newStory: Story) => {
+    setAllStories(currentStories => {
+        const existing = currentStories.find(s => s.userId === newStory.userId);
+        if (existing) {
+            return currentStories.map(s => s.userId === newStory.userId ? newStory : s);
+        }
+        return [newStory, ...currentStories];
+    });
   }
 
   return (
@@ -43,14 +151,12 @@ export function StatusView() {
             <div className="flex items-center gap-4">
               <div className="relative">
                 {me && <UserAvatar user={me} />}
-                <Button size="icon" className="absolute -bottom-2 -right-2 h-6 w-6 rounded-full bg-primary hover:bg-primary/90">
-                  <Plus className="h-4 w-4 text-primary-foreground" />
-                </Button>
+                <StatusUploader onStatusUploaded={handleStatusUploaded} />
               </div>
-              <div>
+              <div onClick={handleMyStoryClick} className="cursor-pointer">
                 <p className="font-semibold">My status</p>
                 <p className="text-sm text-muted-foreground">
-                  {myStory ? "View my status" : "Add to my status"}
+                  {myStory ? `${myStory.stories.length} updates` : "Add to my status"}
                 </p>
               </div>
             </div>
