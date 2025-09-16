@@ -3,8 +3,14 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, MoreVertical, Send } from "lucide-react";
+import { Search, MoreVertical, Send, Users, Phone, Star } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { ChatList } from "./chat-list";
 import { ChatView } from "./chat-view";
 import { StatusView } from "./status-view";
@@ -37,9 +43,27 @@ function LeftPanel({
             <Button variant="ghost" size="icon">
                 <Search className="h-5 w-5 text-muted-foreground" />
             </Button>
-            <Button variant="ghost" size="icon">
-                <MoreVertical className="h-5 w-5 text-muted-foreground" />
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <MoreVertical className="h-5 w-5 text-muted-foreground" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem>
+                  <Star className="mr-2 h-4 w-4" />
+                  <span>Avatar Studio</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Phone className="mr-2 h-4 w-4" />
+                  <span>Calls</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Users className="mr-2 h-4 w-4" />
+                  <span>Contacts</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
         </div>
       </header>
       <div className="p-3">
