@@ -2,11 +2,13 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Image from "next/image";
 import { MessageBubble } from "./message-bubble";
 import type { Message } from "@/lib/data";
 import { loggedInUserId } from "@/lib/data";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import Image from "next/image";
+import { useWallpaper } from "@/hooks/use-wallpaper";
+import { cn } from "@/lib/utils";
 
 type MessageListProps = {
   messages: Message[];
@@ -15,6 +17,7 @@ type MessageListProps = {
 
 export function MessageList({ messages, onDeleteMessage }: MessageListProps) {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const { wallpaper, dimming } = useWallpaper();
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -26,8 +29,17 @@ export function MessageList({ messages, onDeleteMessage }: MessageListProps) {
   }, [messages]);
 
   return (
-    <ScrollArea className="flex-1 bg-secondary/30" ref={scrollAreaRef}>
-      <div className="p-4 space-y-1">
+    <ScrollArea className="flex-1 relative" ref={scrollAreaRef}>
+        <div 
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: `url(${wallpaper})`}}
+        >
+          <div 
+            className="absolute inset-0"
+            style={{ backgroundColor: `rgba(0,0,0,${dimming/100})` }}
+          />
+        </div>
+      <div className="p-4 space-y-1 relative z-10">
         {messages.length > 0 ? (
           messages.map((message) => (
             <MessageBubble
@@ -38,11 +50,14 @@ export function MessageList({ messages, onDeleteMessage }: MessageListProps) {
             />
           ))
         ) : (
-          <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
+          <div className={cn(
+            "flex flex-col items-center justify-center h-full text-center text-muted-foreground",
+            dimming > 50 ? "text-white/80" : ""
+          )}>
             <div className="relative w-48 h-48 mb-4">
               <Image src="https://picsum.photos/seed/chat/300/300" alt="Start chatting" fill className="rounded-full" data-ai-hint="friendly illustration" />
             </div>
-            <h3 className="text-lg font-semibold text-foreground">Start a Conversation</h3>
+            <h3 className={cn("text-lg font-semibold", dimming > 50 ? "text-white" : "text-foreground")}>Start a Conversation</h3>
             <p>No messages here yet. Send a message to get things started!</p>
           </div>
         )}

@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { ArrowLeft, Check, Upload, Sun, Moon } from "lucide-react";
@@ -9,27 +9,23 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
+import { useWallpaper } from "@/hooks/use-wallpaper";
 import placeholderData from "@/lib/placeholder-images.json";
 import { MessageBubble } from "@/components/chat/message-bubble";
-import { Message, loggedInUserId, users } from "@/lib/data";
-
-const defaultWallpaper = "https://picsum.photos/seed/chat-bg/800/1200";
+import { Message, loggedInUserId } from "@/lib/data";
 
 const wallpaperCategories = [
     {
         title: "Light Wallpapers",
-        theme: "light",
         wallpapers: placeholderData.placeholderImages.filter(p => p.id.startsWith('wallpaper-light'))
     },
     {
         title: "Dark Wallpapers",
-        theme: "dark",
         wallpapers: placeholderData.placeholderImages.filter(p => p.id.startsWith('wallpaper-dark'))
     },
     {
         title: "Solid Colors",
-        theme: "any",
         wallpapers: placeholderData.placeholderImages.filter(p => p.id.startsWith('wallpaper-solid'))
     }
 ]
@@ -43,9 +39,16 @@ const sampleMessages: Message[] = [
 export default function WallpaperPage() {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
+  const { wallpaper, dimming, setWallpaper, defaultWallpaper } = useWallpaper();
 
-  const [selectedWallpaper, setSelectedWallpaper] = useState(defaultWallpaper);
-  const [dimming, setDimming] = useState(50);
+  const [selectedWallpaper, setSelectedWallpaper] = useState(wallpaper);
+  const [selectedDimming, setSelectedDimming] = useState(dimming);
+
+  useEffect(() => {
+    setSelectedWallpaper(wallpaper);
+    setSelectedDimming(dimming);
+  }, [wallpaper, dimming]);
   
   const handleBack = () => {
     router.back();
@@ -65,14 +68,28 @@ export default function WallpaperPage() {
       reader.readAsDataURL(file);
     }
   };
+
+  const handleSetWallpaper = () => {
+    setWallpaper(selectedWallpaper, selectedDimming);
+    toast({
+      title: "Wallpaper Set!",
+      description: "Your new chat wallpaper has been applied.",
+    });
+    router.back();
+  };
   
   return (
     <div className="flex h-screen flex-col bg-secondary/30">
-      <header className="flex items-center gap-4 border-b bg-card p-3">
-        <Button variant="ghost" size="icon" onClick={handleBack}>
-          <ArrowLeft className="h-6 w-6" />
+      <header className="flex items-center justify-between border-b bg-card p-3">
+        <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" onClick={handleBack}>
+                <ArrowLeft className="h-6 w-6" />
+            </Button>
+            <h1 className="text-xl font-bold">Wallpaper</h1>
+        </div>
+        <Button onClick={handleSetWallpaper}>
+            Set Wallpaper
         </Button>
-        <h1 className="text-xl font-bold">Wallpaper</h1>
       </header>
       
       <main className="flex-1 grid md:grid-cols-2 overflow-hidden">
@@ -89,7 +106,7 @@ export default function WallpaperPage() {
                 >
                     <div 
                         className="absolute inset-0 flex flex-col justify-end p-4 gap-2"
-                        style={{ backgroundColor: `rgba(0,0,0,${dimming/100})` }}
+                        style={{ backgroundColor: `rgba(0,0,0,${selectedDimming/100})` }}
                     >
                          {sampleMessages.map(msg => (
                             <MessageBubble 
@@ -143,15 +160,15 @@ export default function WallpaperPage() {
                     </CardHeader>
                     <CardContent>
                         <Slider
-                            defaultValue={[dimming]}
+                            value={[selectedDimming]}
                             max={100}
                             step={1}
-                            onValueChange={(value) => setDimming(value[0])}
+                            onValueChange={(value) => setSelectedDimming(value[0])}
                         />
                     </CardContent>
                 </Card>
                 
-                <Button onClick={() => setSelectedWallpaper(defaultWallpaper)}>
+                <Button onClick={() => setSelectedWallpaper(defaultWallpaper)} variant="outline">
                     Reset to Default
                 </Button>
             </div>
