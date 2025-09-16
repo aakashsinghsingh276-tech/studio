@@ -16,18 +16,25 @@ type ChatListProps = {
 };
 
 export function ChatList({ chats, selectedChatId, onSelectChat, searchQuery }: ChatListProps) {
-  const getChatPartner = (chat: Chat): User => {
-    const partnerId = chat.participants.find(p => p !== loggedInUserId);
-    return users.find(u => u.id === partnerId) || users[0];
-  }
+  
+  const getChatInfo = (chat: Chat) => {
+    if (chat.type === 'group') {
+      return {
+        name: chat.name || 'Unnamed Group',
+        avatarUser: { id: 'group', name: chat.name || 'G', avatar: chat.avatar || 'group-placeholder', status: 'offline' } as User
+      };
+    }
+    const partner = users.find(u => u.id === chat.participants.find(p => p !== loggedInUserId)) || users[0];
+    return { name: partner.name, avatarUser: partner };
+  };
 
   const filteredChats = useMemo(() => {
     if (!searchQuery) return chats;
     return chats.filter(chat => {
-      const partner = getChatPartner(chat);
+      const { name } = getChatInfo(chat);
       const lastMessage = chat.messages[chat.messages.length - 1];
       return (
-        partner.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (lastMessage && lastMessage.content.toLowerCase().includes(searchQuery.toLowerCase()))
       );
     });
@@ -36,7 +43,9 @@ export function ChatList({ chats, selectedChatId, onSelectChat, searchQuery }: C
   return (
     <ScrollArea className="flex-1">
       <div className="flex flex-col gap-1 p-2">
-        {filteredChats.map((chat) => (
+        {filteredChats.map((chat) => {
+          const { name, avatarUser } = getChatInfo(chat);
+          return (
           <button
             key={chat.id}
             className={cn(
@@ -45,10 +54,10 @@ export function ChatList({ chats, selectedChatId, onSelectChat, searchQuery }: C
             )}
             onClick={() => onSelectChat(chat)}
           >
-            <UserAvatar user={getChatPartner(chat)} withStatus />
+            <UserAvatar user={avatarUser} withStatus={chat.type === 'private'} />
             <div className="flex-1 overflow-hidden">
               <div className="flex items-center justify-between">
-                <p className="truncate">{getChatPartner(chat).name}</p>
+                <p className="truncate">{name}</p>
                 <p className="text-xs text-muted-foreground">
                   {chat.messages[chat.messages.length - 1]?.timestamp}
                 </p>
@@ -65,7 +74,7 @@ export function ChatList({ chats, selectedChatId, onSelectChat, searchQuery }: C
               </div>
             </div>
           </button>
-        ))}
+        )})}
         {filteredChats.length === 0 && (
           <div className="flex h-full flex-col items-center justify-center gap-2 p-8 text-center text-muted-foreground">
             <p className="font-semibold">No chats found</p>

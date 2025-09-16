@@ -33,12 +33,15 @@ type ChatViewProps = {
 export function ChatView({ chat, onBack }: ChatViewProps) {
   const [messages, setMessages] = useState<MessageType[]>(chat.messages);
 
-  const getChatPartner = (chat: Chat): User => {
-    const partnerId = chat.participants.find((p) => p !== loggedInUserId);
-    return users.find((u) => u.id === partnerId) || users[0];
-  };
+  const partner: User | undefined =
+    chat.type === "private"
+      ? users.find((u) => u.id === chat.participants.find(p => p !== loggedInUserId))
+      : undefined;
 
-  const partner = getChatPartner(chat);
+  const chatName = chat.type === "group" ? chat.name : partner?.name;
+  const chatAvatar = chat.type === 'group' ? 
+    { id: 'group', name: chat.name || 'Group', avatar: chat.avatar || 'group-placeholder', status: 'offline' } as User :
+    partner!;
 
   const handleSendMessage = (content: string, attachment?: Attachment) => {
     const newMessage: MessageType = {
@@ -64,12 +67,18 @@ export function ChatView({ chat, onBack }: ChatViewProps) {
         <Button variant="ghost" size="icon" className="md:hidden" onClick={onBack}>
           <ArrowLeft className="h-6 w-6" />
         </Button>
-        <UserAvatar user={partner} withStatus />
+        <UserAvatar user={chatAvatar} withStatus={chat.type === 'private'} />
         <div className="flex-1">
-          <p className="font-semibold">{partner.name}</p>
+          <p className="font-semibold">{chatName}</p>
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <Lock className="h-3 w-3" />
-            <span>End-to-end encrypted</span>
+            {chat.type === 'private' ? (
+                <>
+                    <Lock className="h-3 w-3" />
+                    <span>End-to-end encrypted</span>
+                </>
+            ) : (
+                <span className="truncate">{chat.participants.map(p => users.find(u => u.id === p)?.name).join(', ')}</span>
+            )}
           </div>
         </div>
         <div className="flex items-center gap-1">

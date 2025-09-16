@@ -78,6 +78,7 @@
     { "id": "wallpaper-solid-3", "description": "Solid Color 3", "imageUrl": "https://placehold.co/400x700/bbf7d0/bbf7d0", "imageHint": "solid light green" },
     { "id": "wallpaper-solid-4", "description": "Solid Color 4", "imageUrl": "https://placehold.co/400x700/bfdbfe/bfdbfe", "imageHint": "solid light blue" },
     { "id": "wallpaper-solid-5", "description": "Solid Color 5", "imageUrl": "https://placehold.co/400x700/27272a/27272a", "imageHint": "solid dark gray" },
-    { "id": "wallpaper-solid-6", "description": "Solid Color 6", "imageUrl": "https://placehold.co/400x700/450a0a/450a0a", "imageHint": "solid dark red" }
+    { "id": "wallpaper-solid-6", "description": "Solid Color 6", "imageUrl": "https://placehold.co/400x700/450a0a/450a0a", "imageHint": "solid dark red" },
+    { "id": "group-placeholder", "description": "Default Group Avatar", "imageUrl": "", "imageHint": "group people" }
   ]
 }

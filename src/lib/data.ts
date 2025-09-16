@@ -1,3 +1,4 @@
+
 export type User = {
   id: string;
   name: string;
@@ -35,6 +36,8 @@ export type Message = {
 export type Chat = {
   id: string;
   type: 'private' | 'group';
+  name?: string; // Optional name for groups
+  avatar?: string; // Optional avatar for groups
   participants: string[];
   messages: Message[];
   unreadCount: number;

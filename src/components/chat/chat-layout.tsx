@@ -12,6 +12,7 @@ import {
   Settings,
   Star,
   Users,
+  UserPlus
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -68,6 +69,12 @@ function LeftPanel({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+               <DropdownMenuItem asChild>
+                <Link href="/new/group">
+                  <UserPlus className="mr-2 h-4 w-4" />
+                  <span>New Group</span>
+                </Link>
+              </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link href="/avatar-studio">
                   <Star className="mr-2 h-4 w-4" />
@@ -143,7 +150,7 @@ function LeftPanel({
 
 export function ChatLayout() {
   const [chats, setChats] = useState<Chat[]>(initialChats);
-  const [selectedChat, setSelectedChat] = useState<Chat | null>(chats[0]);
+  const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
   const [activeTab, setActiveTab] = useState("chats");
 
   const handleSelectChat = (chat: Chat) => {
@@ -155,6 +162,14 @@ export function ChatLayout() {
       )
     );
   };
+  
+  // Set the first chat as selected by default if it exists.
+  useState(() => {
+    if (initialChats.length > 0 && !selectedChat) {
+      handleSelectChat(initialChats[0]);
+    }
+  });
+
 
   return (
     <div className="flex h-screen w-full bg-background font-body text-sm">
