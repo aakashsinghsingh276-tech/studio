@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useRef } from "react";
@@ -9,9 +10,10 @@ import Image from "next/image";
 
 type MessageListProps = {
   messages: Message[];
+  onDeleteMessage: (messageId: string) => void;
 };
 
-export function MessageList({ messages }: MessageListProps) {
+export function MessageList({ messages, onDeleteMessage }: MessageListProps) {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -25,13 +27,14 @@ export function MessageList({ messages }: MessageListProps) {
 
   return (
     <ScrollArea className="flex-1 bg-secondary/30" ref={scrollAreaRef}>
-      <div className="p-4 space-y-4">
+      <div className="p-4 space-y-1">
         {messages.length > 0 ? (
           messages.map((message) => (
             <MessageBubble
               key={message.id}
               message={message}
               isSender={message.senderId === loggedInUserId}
+              onDelete={() => onDeleteMessage(message.id)}
             />
           ))
         ) : (

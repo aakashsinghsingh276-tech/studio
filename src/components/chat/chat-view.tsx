@@ -10,6 +10,7 @@ import {
   Phone,
   Video,
   Lock,
+  Trash2,
 } from "lucide-react";
 import { UserAvatar } from "./user-avatar";
 import { MessageList } from "./message-list";
@@ -17,6 +18,12 @@ import { ChatInput } from "./chat-input";
 import { cn } from "@/lib/utils";
 import type { Chat, User, Message as MessageType } from "@/lib/data";
 import { users, loggedInUserId } from "@/lib/data";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type ChatViewProps = {
   chat: Chat;
@@ -43,6 +50,10 @@ export function ChatView({ chat, onBack }: ChatViewProps) {
       read: false,
     };
     setMessages((prev) => [...prev, newMessage]);
+  };
+
+  const handleDeleteMessage = (messageId: string) => {
+    setMessages((prev) => prev.filter((msg) => msg.id !== messageId));
   };
   
   return (
@@ -71,14 +82,22 @@ export function ChatView({ chat, onBack }: ChatViewProps) {
               <Phone className="h-5 w-5 text-muted-foreground" />
             </Link>
           </Button>
-          <Button variant="ghost" size="icon">
-            <MoreVertical className="h-5 w-5 text-muted-foreground" />
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <MoreVertical className="h-5 w-5 text-muted-foreground" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem>Clear Chat</DropdownMenuItem>
+              <DropdownMenuItem>Block</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </header>
 
       {/* Message List */}
-      <MessageList messages={messages} />
+      <MessageList messages={messages} onDeleteMessage={handleDeleteMessage} />
 
       {/* Chat Input */}
       <ChatInput
