@@ -41,24 +41,34 @@ export type Chat = {
 };
 
 export type Status = {
-  id: string;
-  userId: string;
   type: 'image' | 'text';
-  content: string;
+  url?: string;
+  content?: string;
+  duration?: number;
   timestamp: string;
   viewed: boolean;
+  header: {
+    heading: string;
+    subheading: string;
+    profileImage: string;
+  }
 };
+
+export type Story = {
+    userId: string;
+    stories: Status[];
+}
 
 export const loggedInUserId = 'user1';
 
 export const users: User[] = [
   { id: 'user1', name: 'You', avatar: '1', status: 'online' },
-  { id: 'user2', name: 'Alice', avatar: '2', status: 'online' },
-  { id: 'user3', name: 'Bob', avatar: '3', status: 'offline' },
-  { id: 'user4', name: 'Charlie', avatar: '4', status: 'online' },
-  { id: 'user5', name: 'David', avatar: '5', status: 'offline' },
-  { id: 'user6', name: 'Eve', avatar: '6', status: 'online' },
-  { id: 'user7', name: 'Frank', avatar: '7', status: 'online' },
+  { id: 'user2', name: 'Alice', avatar: 'https://avatars.githubusercontent.com/u/1', status: 'online' },
+  { id: 'user3', name: 'Bob', avatar: 'https://avatars.githubusercontent.com/u/2', status: 'offline' },
+  { id: 'user4', name: 'Charlie', avatar: 'https://avatars.githubusercontent.com/u/3', status: 'online' },
+  { id: 'user5', name: 'David', avatar: 'https://avatars.githubusercontent.com/u/4', status: 'offline' },
+  { id: 'user6', name: 'Eve', avatar: 'https://avatars.githubusercontent.com/u/5', status: 'online' },
+  { id: 'user7', name: 'Frank', avatar: 'https://avatars.githubusercontent.com/u/6', status: 'online' },
 ];
 
 export const messages: Message[] = [
@@ -82,9 +92,35 @@ export const chats: Chat[] = [
   { id: 'chat6', type: 'private', participants: ['user1', 'user7'], messages: messages.filter(m => m.chatId === 'chat6'), unreadCount: 0 },
 ];
 
-export const statuses: Status[] = [
-  { id: 'status1', userId: 'user1', type: 'image', content: '10', timestamp: '2 minutes ago', viewed: true },
-  { id: 'status2', userId: 'user2', type: 'image', content: '11', timestamp: '15 minutes ago', viewed: false },
-  { id: 'status3', userId: 'user4', type: 'text', content: 'Feeling creative today!', timestamp: '45 minutes ago', viewed: false },
-  { id: 'status4', userId: 'user6', type: 'image', content: '12', timestamp: '2 hours ago', viewed: true },
+const generateStory = (user: User, statuses: {type: 'image' | 'text', content: string, viewed: boolean, timestamp: string}[]) => ({
+    userId: user.id,
+    stories: statuses.map(s => ({
+        type: s.type,
+        url: s.type === 'image' ? `https://picsum.photos/seed/${s.content}/1080/1920` : undefined,
+        content: s.type === 'text' ? s.content : undefined,
+        duration: 5000,
+        timestamp: s.timestamp,
+        viewed: s.viewed,
+        header: {
+            heading: user.name,
+            subheading: s.timestamp,
+            profileImage: user.avatar.startsWith('http') ? user.avatar : `https://picsum.photos/seed/${user.avatar}/200/200`
+        }
+    }))
+})
+
+export const stories: Story[] = [
+    generateStory(users.find(u => u.id === 'user2')!, [
+        { type: 'image', content: '31', viewed: false, timestamp: '15 minutes ago' },
+        { type: 'image', content: '32', viewed: false, timestamp: '10 minutes ago' }
+    ]),
+    generateStory(users.find(u => u.id === 'user4')!, [
+        { type: 'text', content: 'Feeling creative today!', viewed: false, timestamp: '45 minutes ago' }
+    ]),
+    generateStory(users.find(u => u.id === 'user6')!, [
+        { type: 'image', content: '33', viewed: true, timestamp: '2 hours ago' }
+    ]),
 ];
+
+// This is the old statuses data structure, which is now replaced by stories
+export const statuses: any[] = [];
