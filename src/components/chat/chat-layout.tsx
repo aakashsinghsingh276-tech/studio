@@ -1,6 +1,8 @@
+
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import {
   MoreVertical,
   Phone,
@@ -63,9 +65,11 @@ function LeftPanel({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>
-                <Star className="mr-2 h-4 w-4" />
-                <span>Avatar Studio</span>
+              <DropdownMenuItem asChild>
+                <Link href="/avatar-studio">
+                  <Star className="mr-2 h-4 w-4" />
+                  <span>Avatar Studio</span>
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <Phone className="mr-2 h-4 w-4" />
