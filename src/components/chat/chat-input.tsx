@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Paperclip, Send, Smile, Loader2, Image as ImageIcon, Contact, MapPin, Film, Music } from "lucide-react";
 import { generateSmartReplies, describeImage } from "@/actions/ai-actions";
-import { type Message, type Attachment } from "@/lib/data";
+import { type Message, type Attachment, users } from "@/lib/data";
 import { loggedInUserId } from "@/lib/data";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { useToast } from "@/hooks/use-toast";
@@ -144,8 +144,23 @@ export function ChatInput({ onSendMessage, lastMessage }: ChatInputProps) {
   };
 
   const handleShareContact = () => {
-      // TODO: Implement contact sharing logic
-      alert("Contact sharing is not implemented yet.");
+      // In a real app, you'd open a contact picker.
+      // For this demo, we'll share a predefined contact.
+      const contactToShare = users.find(u => u.id === 'user3'); // Sharing 'Bob' as an example
+      if (contactToShare) {
+        const newAttachment: Attachment = {
+            id: uuidv4(),
+            type: "contact",
+            contact: contactToShare
+        };
+        onSendMessage(`Shared contact: ${contactToShare.name}`, newAttachment);
+      } else {
+          toast({
+              variant: "destructive",
+              title: "Contact Not Found",
+              description: "Could not find the example contact to share."
+          })
+      }
   }
   
   const handleEmojiClick = (emojiData: EmojiClickData) => {
@@ -227,7 +242,6 @@ export function ChatInput({ onSendMessage, lastMessage }: ChatInputProps) {
                     <PopoverContent className="w-auto p-0 border-0">
                         <EmojiPicker 
                             onEmojiClick={handleEmojiClick}
-                            searchDisabled={false}
                         />
                     </PopoverContent>
                 </Popover>

@@ -1,4 +1,5 @@
 
+
 export type User = {
   id: string;
   name: string;
@@ -95,7 +96,7 @@ export const messages: Message[] = [
   { id: 'msg9', chatId: 'chat6', senderId: 'user7', content: 'Do you have the report ready?', timestamp: 'Friday', read: false },
 ];
 
-export const chats: Chat[] = [
+export let chats: Chat[] = [
   { id: 'chat1', type: 'private', participants: ['user1', 'user2'], messages: messages.filter(m => m.chatId === 'chat1'), unreadCount: 0 },
   { id: 'chat2', type: 'private', participants: ['user1', 'user3'], messages: messages.filter(m => m.chatId === 'chat2'), unreadCount: 0 },
   { id: 'chat3', type: 'private', participants: ['user1', 'user4'], messages: messages.filter(m => m.chatId === 'chat3'), unreadCount: 1 },
@@ -130,7 +131,7 @@ const generateStory = (user: User, statuses: {type: 'image' | 'text' | 'video' |
     }))
 })
 
-export const stories: Story[] = [
+export let stories: Story[] = [
     generateStory(users.find(u => u.id === 'user2')!, [
         { type: 'image', content: '31', viewed: false, timestamp: '15 minutes ago' },
         { type: 'image', content: '32', viewed: false, timestamp: '10 minutes ago' }

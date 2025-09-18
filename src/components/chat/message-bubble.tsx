@@ -1,7 +1,7 @@
 
 import { cn } from "@/lib/utils";
 import type { Message, User } from "@/lib/data";
-import { Check, CheckCheck, MoreVertical, Trash2, Download, MapPin, Music, Film } from 'lucide-react';
+import { Check, CheckCheck, MoreVertical, Trash2, Download, MapPin, Music, Film, Contact } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -41,6 +41,8 @@ export function MessageBubble({ message, isSender, onDelete }: MessageBubbleProp
 
   const renderAttachment = () => {
     if (!message.attachment) return null;
+    
+    const isContactShare = message.content.startsWith('Shared contact:');
 
     switch (message.attachment.type) {
       case 'image':
@@ -132,12 +134,20 @@ export function MessageBubble({ message, isSender, onDelete }: MessageBubbleProp
         return (
             <Card className="overflow-hidden border-none">
                 <CardContent className="p-4 flex items-center gap-4">
-                    <UserAvatar user={contact} />
-                    <div>
+                    <Contact className="h-8 w-8 text-primary" />
+                    <div className="flex items-center gap-3">
+                      <UserAvatar user={contact} />
+                      <div>
                         <p className="font-semibold">{contact.name}</p>
                         <p className="text-sm text-muted-foreground">Contact</p>
+                      </div>
                     </div>
                 </CardContent>
+                {message.content && isContactShare && (
+                     <CardFooter className="p-2 bg-background/50">
+                        <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                    </CardFooter>
+                )}
             </Card>
         )
 
@@ -163,7 +173,7 @@ export function MessageBubble({ message, isSender, onDelete }: MessageBubbleProp
                 <p className="text-sm whitespace-pre-wrap">{message.content}</p>
             )}
 
-            <div className={cn("flex items-center justify-end gap-2 mt-1 self-end", message.attachment && "p-2 pt-0")}>
+            <div className={cn("flex items-center justify-end gap-2 mt-1 self-end", message.attachment && !(message.attachment.type === 'contact' && message.content.startsWith('Shared contact:')) && "p-2 pt-0")}>
                 <span className="text-xs opacity-70">
                 {message.timestamp}
                 </span>
