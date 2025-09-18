@@ -225,7 +225,10 @@ export function ChatInput({ onSendMessage, lastMessage }: ChatInputProps) {
                         </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0 border-0">
-                        <EmojiPicker onEmojiClick={handleEmojiClick} />
+                        <EmojiPicker 
+                            onEmojiClick={handleEmojiClick}
+                            searchDisabled={false}
+                        />
                     </PopoverContent>
                 </Popover>
 
@@ -239,3 +242,5 @@ export function ChatInput({ onSendMessage, lastMessage }: ChatInputProps) {
     </div>
   );
 }
+
+    
