@@ -35,7 +35,7 @@ export default function VerifyEmailPage() {
                     <CardTitle>Verify Your Email</CardTitle>
                     <CardDescription>
                         A verification link has been sent to your email address. Please check your inbox and click the link to continue.
-                    </d_card-description>
+                    </CardDescription>
                 </CardHeader>
                 <CardContent>
                     <p className="text-sm text-muted-foreground">
