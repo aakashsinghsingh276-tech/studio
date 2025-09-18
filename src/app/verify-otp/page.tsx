@@ -7,14 +7,24 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { MessageSquareShare } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function VerifyOtpPage() {
     const router = useRouter();
+    const { toast } = useToast();
 
     const handleVerifyOtp = () => {
         // In a real app, you would verify the OTP against the one sent to the user.
         localStorage.setItem("auth-step", "loggedIn"); // Final step
         router.push("/");
+    };
+
+    const handleResendCode = () => {
+        // In a real app, you would trigger the service to send another OTP.
+        toast({
+            title: "Code Resent",
+            description: "A new 6-digit code has been sent to your phone number.",
+        });
     };
 
     return (
@@ -36,7 +46,7 @@ export default function VerifyOtpPage() {
                     <Button className="w-full" onClick={handleVerifyOtp}>
                         Verify & Log In
                     </Button>
-                    <Button variant="link" size="sm">Didn't receive a code?</Button>
+                    <Button variant="link" size="sm" onClick={handleResendCode}>Didn't receive a code?</Button>
                 </CardFooter>
             </Card>
         </div>

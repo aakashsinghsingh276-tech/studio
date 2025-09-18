@@ -5,14 +5,24 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { MailCheck } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function VerifyEmailPage() {
     const router = useRouter();
+    const { toast } = useToast();
 
     const handleVerification = () => {
         // In a real app, this would be handled by the user clicking a link in their email.
         localStorage.setItem("auth-step", "email-verified");
         router.push("/login");
+    };
+
+    const handleResendLink = () => {
+        // In a real app, you would trigger a service to send another email.
+        toast({
+            title: "Verification Link Sent",
+            description: "A new verification link has been sent to your email address.",
+        });
     };
 
     return (
@@ -36,7 +46,7 @@ export default function VerifyEmailPage() {
                     <Button className="w-full" onClick={handleVerification}>
                         (Simulate) I've Verified My Email
                     </Button>
-                     <Button variant="link" size="sm">Resend verification link</Button>
+                     <Button variant="link" size="sm" onClick={handleResendLink}>Resend verification link</Button>
                 </CardFooter>
             </Card>
         </div>
