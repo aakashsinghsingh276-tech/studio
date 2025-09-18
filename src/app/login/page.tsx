@@ -1,10 +1,11 @@
 
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { LogIn } from "lucide-react";
+import { LogIn, Eye, EyeOff } from "lucide-react";
 import { UserAvatar } from "@/components/chat/user-avatar";
 import { users, loggedInUserId } from "@/lib/data";
 import Link from "next/link";
@@ -14,6 +15,7 @@ import { Input } from "@/components/ui/input";
 export default function LoginPage() {
     const router = useRouter();
     const me = users.find(u => u.id === loggedInUserId);
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleLogin = () => {
         // In a real app, you'd verify credentials
@@ -38,9 +40,18 @@ export default function LoginPage() {
                         <Label htmlFor="email">Email</Label>
                         <Input id="email" type="email" placeholder="m@example.com" defaultValue="you@chaton.ai" />
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-2 relative">
                         <Label htmlFor="password">Password</Label>
-                        <Input id="password" type="password" defaultValue="password" />
+                        <Input id="password" type={showPassword ? "text" : "password"} defaultValue="password" />
+                        <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="absolute right-1 bottom-1 h-8 w-8"
+                            onClick={() => setShowPassword(!showPassword)}
+                        >
+                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                            <span className="sr-only">{showPassword ? 'Hide password' : 'Show password'}</span>
+                        </Button>
                     </div>
                 </CardContent>
                 <CardFooter className="flex flex-col gap-4">
