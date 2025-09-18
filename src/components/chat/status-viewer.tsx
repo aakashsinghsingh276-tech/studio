@@ -1,9 +1,10 @@
 
 "use client";
 
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import Stories from 'react-insta-stories';
 import { type Story } from "@/lib/data";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 type StatusViewerProps = {
   story: Story;
@@ -29,6 +30,11 @@ export function StatusViewer({ story, onClose }: StatusViewerProps) {
   return (
     <Dialog open onOpenChange={onClose}>
       <DialogContent className="p-0 border-0 bg-black max-w-full h-full md:h-[95%] md:max-w-md flex items-center justify-center">
+        <DialogTitle asChild>
+            <VisuallyHidden>
+                <h2>Status Viewer</h2>
+            </VisuallyHidden>
+        </DialogTitle>
         <Stories
           stories={storyContent}
           defaultInterval={5000}
