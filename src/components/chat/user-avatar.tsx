@@ -1,7 +1,7 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-import type { User, Story } from "@/lib/data";
+import type { User } from "@/lib/data";
 import Image from "next/image";
 import placeholderData from '@/lib/placeholder-images.json';
 import { Users } from "lucide-react";
@@ -10,19 +10,15 @@ type UserAvatarProps = {
   user: User;
   className?: string;
   withStatus?: boolean;
-  story?: Story;
 };
 
 const placeholderImages = placeholderData.placeholderImages;
 
-export function UserAvatar({ user, className, withStatus = false, story }: UserAvatarProps) {
+export function UserAvatar({ user, className, withStatus = false }: UserAvatarProps) {
   const placeholder = placeholderImages.find(p => p.id === user.avatar);
-  const hasUnviewedStories = story?.stories.some(s => !s.viewed);
 
   const avatarContainerClasses = cn(
-    "relative",
-    story && "p-0.5 rounded-full",
-    hasUnviewedStories ? "border-2 border-primary" : story ? "border-2 border-border" : ""
+    "relative"
   );
 
   const isGroupPlaceholder = user.avatar === 'group-placeholder';

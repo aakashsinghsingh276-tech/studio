@@ -27,14 +27,11 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Chat } from "@/lib/data";
 import { chats as initialChats, loggedInUserId, users } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { ChatList } from "./chat-list";
-import { ChatView } from "./chat-view";
-import { StatusView } from "./status-view";
 import { UserAvatar } from "./user-avatar";
 import { Input } from "../ui/input";
 import { ThemeSubMenu } from "../theme-toggle";
@@ -42,14 +39,10 @@ import { ThemeSubMenu } from "../theme-toggle";
 const me = users.find((u) => u.id === loggedInUserId);
 
 function LeftPanel({
-  activeTab,
-  setActiveTab,
   onSelectChat,
   selectedChatId,
   chats,
 }: {
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
   onSelectChat: (chat: Chat) => void;
   selectedChatId: string | null;
   chats: Chat[];
@@ -139,24 +132,12 @@ function LeftPanel({
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
         </div>
       </div>
-      <div className="p-3 pt-0">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="chats">Chats</TabsTrigger>
-            <TabsTrigger value="status">Status</TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </div>
-      {activeTab === "chats" ? (
-        <ChatList
-          chats={chats}
-          selectedChatId={selectedChatId}
-          onSelectChat={onSelectChat}
-          searchQuery={searchQuery}
-        />
-      ) : (
-        <StatusView />
-      )}
+      <ChatList
+        chats={chats}
+        selectedChatId={selectedChatId}
+        onSelectChat={onSelectChat}
+        searchQuery={searchQuery}
+      />
     </>
   );
 }
@@ -164,7 +145,6 @@ function LeftPanel({
 export function ChatLayout() {
   const [chats, setChats] = useState<Chat[]>(initialChats);
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
-  const [activeTab, setActiveTab] = useState("chats");
 
   const handleSelectChat = (chat: Chat) => {
     setSelectedChat(chat);
@@ -193,8 +173,6 @@ export function ChatLayout() {
         )}
       >
         <LeftPanel
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
           onSelectChat={handleSelectChat}
           selectedChatId={selectedChat?.id || null}
           chats={chats}

@@ -44,25 +44,6 @@ export type Chat = {
   unreadCount: number;
 };
 
-export type Status = {
-  type: 'image' | 'text' | 'video' | 'audio';
-  url?: string;
-  content?: string;
-  duration?: number;
-  timestamp: string;
-  viewed: boolean;
-  header: {
-    heading: string;
-    subheading: string;
-    profileImage: string;
-  }
-};
-
-export type Story = {
-    userId: string;
-    stories: Status[];
-}
-
 export type Call = {
   id: string;
   userId: string;
@@ -113,36 +94,3 @@ export const calls: Call[] = [
     { id: 'call5', userId: 'user6', type: 'outgoing', callType: 'video', timestamp: 'Tuesday, 4:30 PM', duration: '23m 10s' },
     { id: 'call6', userId: 'user7', type: 'incoming', callType: 'audio', timestamp: 'Tuesday, 9:00 AM', duration: '1m 5s' },
   ];
-
-const generateStory = (user: User, statuses: {type: 'image' | 'text' | 'video' | 'audio', content: string, viewed: boolean, timestamp: string}[]) => ({
-    userId: user.id,
-    stories: statuses.map(s => ({
-        type: s.type,
-        url: s.type === 'image' || s.type === 'video' ? `https://picsum.photos/seed/${s.content}/1080/1920` : undefined,
-        content: s.type === 'text' ? s.content : undefined,
-        duration: 5000,
-        timestamp: s.timestamp,
-        viewed: s.viewed,
-        header: {
-            heading: user.name,
-            subheading: s.timestamp,
-            profileImage: user.avatar.startsWith('http') ? user.avatar : `https://picsum.photos/seed/${user.avatar}/200/200`
-        }
-    }))
-})
-
-export let stories: Story[] = [
-    generateStory(users.find(u => u.id === 'user2')!, [
-        { type: 'image', content: '31', viewed: false, timestamp: '15 minutes ago' },
-        { type: 'image', content: '32', viewed: false, timestamp: '10 minutes ago' }
-    ]),
-    generateStory(users.find(u => u.id === 'user4')!, [
-        { type: 'text', content: 'Feeling creative today!', viewed: false, timestamp: '45 minutes ago' }
-    ]),
-    generateStory(users.find(u => u.id === 'user6')!, [
-        { type: 'image', content: '33', viewed: true, timestamp: '2 hours ago' }
-    ]),
-];
-
-// This is the old statuses data structure, which is now replaced by stories
-export const statuses: any[] = [];
