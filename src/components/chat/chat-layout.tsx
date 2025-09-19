@@ -35,6 +35,7 @@ import { ChatList } from "./chat-list";
 import { UserAvatar } from "./user-avatar";
 import { Input } from "../ui/input";
 import { ThemeSubMenu } from "../theme-toggle";
+import { ChatView } from "./chat-view";
 
 const me = users.find((u) => u.id === loggedInUserId);
 
@@ -51,7 +52,7 @@ function LeftPanel({
   const router = useRouter();
 
   const handleLogout = () => {
-    localStorage.removeItem("loggedIn");
+    localStorage.removeItem("auth-step");
     router.push("/login");
   };
 
