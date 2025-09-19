@@ -15,6 +15,9 @@ import {
   Users,
   UserPlus,
   LogOut,
+  MessageSquare,
+  Users2,
+  PhoneCall,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -28,7 +31,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { Chat } from "@/lib/data";
-import { chats as initialChats, loggedInUserId, users } from "@/lib/data";
+import { chats as initialChats, loggedInUserId, users, stories } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { ChatList } from "./chat-list";
@@ -36,8 +39,30 @@ import { UserAvatar } from "./user-avatar";
 import { Input } from "../ui/input";
 import { ThemeSubMenu } from "../theme-toggle";
 import { ChatView } from "./chat-view";
+import { StatusView } from "./status-view";
 
 const me = users.find((u) => u.id === loggedInUserId);
+
+type NavLinkProps = {
+  name: string;
+  icon: React.ElementType;
+  isActive: boolean;
+  onClick: () => void;
+};
+
+const NavLink = ({ name, icon: Icon, isActive, onClick }: NavLinkProps) => (
+  <button
+    onClick={onClick}
+    className={cn(
+      "flex flex-col items-center gap-1 w-full p-2 rounded-lg transition-colors",
+      isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-secondary"
+    )}
+  >
+    <Icon className="h-6 w-6" />
+    <span className="text-xs font-medium">{name}</span>
+  </button>
+);
+
 
 function LeftPanel({
   onSelectChat,
@@ -50,6 +75,8 @@ function LeftPanel({
 }) {
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
+  const [activeTab, setActiveTab] = useState("Chats");
+
 
   const handleLogout = () => {
     localStorage.removeItem("auth-step");
@@ -59,7 +86,7 @@ function LeftPanel({
   return (
     <>
       <header className="flex items-center justify-between border-b bg-card p-3">
-        {me && <UserAvatar user={me} />}
+        {me && <UserAvatar user={me} withStatus />}
         <div className="flex items-center gap-2">
           <h1 className="text-xl font-bold">ChatOn</h1>
         </div>
@@ -81,12 +108,6 @@ function LeftPanel({
                 <Link href="/avatar-studio">
                   <Star className="mr-2 h-4 w-4" />
                   <span>Avatar Studio</span>
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/calls">
-                  <Phone className="mr-2 h-4 w-4" />
-                  <span>Calls</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
@@ -122,7 +143,7 @@ function LeftPanel({
           </DropdownMenu>
         </div>
       </header>
-      <div className="p-3">
+       <div className="p-3">
         <div className="relative">
           <Input 
             placeholder="Search chats or contacts..."
@@ -133,12 +154,48 @@ function LeftPanel({
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
         </div>
       </div>
-      <ChatList
-        chats={chats}
-        selectedChatId={selectedChatId}
-        onSelectChat={onSelectChat}
-        searchQuery={searchQuery}
-      />
+      
+      {/* Main content area for the left panel */}
+      <div className="flex-1 overflow-y-auto">
+        {activeTab === "Chats" && (
+          <ChatList
+            chats={chats}
+            selectedChatId={selectedChatId}
+            onSelectChat={onSelectChat}
+            searchQuery={searchQuery}
+          />
+        )}
+        {activeTab === "Status" && <StatusView />}
+        {activeTab === "Calls" && (
+           <div className="p-4">
+             <Link href="/calls" className="w-full">
+              <Button variant="outline" className="w-full">View Call Log</Button>
+            </Link>
+           </div>
+        )}
+      </div>
+
+       {/* Bottom Navigation */}
+      <nav className="flex items-center justify-around p-2 border-t">
+        <NavLink
+          name="Chats"
+          icon={MessageSquare}
+          isActive={activeTab === "Chats"}
+          onClick={() => setActiveTab("Chats")}
+        />
+        <NavLink
+          name="Status"
+          icon={Users2}
+          isActive={activeTab === "Status"}
+          onClick={() => setActiveTab("Status")}
+        />
+        <NavLink
+          name="Calls"
+          icon={PhoneCall}
+          isActive={activeTab === "Calls"}
+          onClick={() => setActiveTab("Calls")}
+        />
+      </nav>
     </>
   );
 }

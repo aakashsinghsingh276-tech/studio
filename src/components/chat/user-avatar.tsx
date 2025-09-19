@@ -5,6 +5,7 @@ import type { User } from "@/lib/data";
 import Image from "next/image";
 import placeholderData from '@/lib/placeholder-images.json';
 import { Users } from "lucide-react";
+import { stories } from "@/lib/data";
 
 type UserAvatarProps = {
   user: User;
@@ -17,8 +18,12 @@ const placeholderImages = placeholderData.placeholderImages;
 export function UserAvatar({ user, className, withStatus = false }: UserAvatarProps) {
   const placeholder = placeholderImages.find(p => p.id === user.avatar);
 
+  const userStory = withStatus ? stories.find(s => s.userId === user.id) : null;
+  const hasUnreadStory = userStory && !userStory.isRead;
+
   const avatarContainerClasses = cn(
-    "relative"
+    "relative",
+    hasUnreadStory && "ring-2 ring-primary ring-offset-2 ring-offset-background rounded-full"
   );
 
   const isGroupPlaceholder = user.avatar === 'group-placeholder';
@@ -54,7 +59,7 @@ export function UserAvatar({ user, className, withStatus = false }: UserAvatarPr
           {isGroupPlaceholder ? 'G' : user.name.charAt(0)}
         </AvatarFallback>
       </Avatar>
-      {withStatus && user.status === "online" && (
+      {withStatus && user.status === "online" && !userStory && (
         <span className="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-green-500 ring-2 ring-background" />
       )}
     </div>

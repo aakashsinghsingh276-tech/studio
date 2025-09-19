@@ -53,6 +53,18 @@ export type Call = {
   duration?: string;
 };
 
+export type Story = {
+  id: string;
+  imageUrl: string;
+  timestamp: string;
+};
+
+export type Status = {
+  userId: string;
+  stories: Story[];
+  isRead: boolean;
+};
+
 export const loggedInUserId = 'user1';
 
 export const users: User[] = [
@@ -94,3 +106,35 @@ export const calls: Call[] = [
     { id: 'call5', userId: 'user6', type: 'outgoing', callType: 'video', timestamp: 'Tuesday, 4:30 PM', duration: '23m 10s' },
     { id: 'call6', userId: 'user7', type: 'incoming', callType: 'audio', timestamp: 'Tuesday, 9:00 AM', duration: '1m 5s' },
   ];
+
+export const stories: Status[] = [
+  {
+    userId: 'user1',
+    isRead: true,
+    stories: [
+      { id: 'story1_1', imageUrl: 'https://picsum.photos/seed/s1_1/400/700', timestamp: '2 hours ago' },
+    ]
+  },
+  {
+    userId: 'user2',
+    isRead: false,
+    stories: [
+      { id: 'story2_1', imageUrl: 'https://picsum.photos/seed/s2_1/400/700', timestamp: 'Just now' },
+      { id: 'story2_2', imageUrl: 'https://picsum.photos/seed/s2_2/400/700', timestamp: '10 minutes ago' },
+    ]
+  },
+  {
+    userId: 'user3',
+    isRead: false,
+    stories: [
+      { id: 'story3_1', imageUrl: 'https://picsum.photos/seed/s3_1/400/700', timestamp: '30 minutes ago' },
+    ]
+  },
+  {
+    userId: 'user4',
+    isRead: true,
+    stories: [
+        { id: 'story4_1', imageUrl: 'https://picsum.photos/seed/s4_1/400/700', timestamp: '8 hours ago' },
+    ]
+  },
+];
