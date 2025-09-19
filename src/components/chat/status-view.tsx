@@ -1,50 +1,113 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { PlusCircle } from "lucide-react";
 import { UserAvatar } from "./user-avatar";
 import { StatusViewer } from "./status-viewer";
-import { type Status, type User, loggedInUserId, users, stories } from "@/lib/data";
+import { type Status, type User, loggedInUserId, users, stories as initialStories, Story } from "@/lib/data";
+import { v4 as uuidv4 } from 'uuid';
+import { formatDistanceToNow, isBefore, sub } from 'date-fns';
 
-const getStatusData = (userId: string): Status | undefined => {
-    return stories.find(story => story.userId === userId);
-}
-
-const getUnreadStatuses = () => {
-    return stories.filter(story => !story.isRead && story.userId !== loggedInUserId);
-}
-const getReadStatuses = () => {
-    return stories.filter(story => story.isRead && story.userId !== loggedInUserId);
-}
+const filterActiveStories = (statuses: Status[]): Status[] => {
+    const twentyFourHoursAgo = sub(new Date(), { hours: 24 });
+    return statuses.map(status => {
+        const activeStories = status.stories.filter(story => 
+            isBefore(twentyFourHoursAgo, new Date(story.timestamp))
+        );
+        return { ...status, stories: activeStories };
+    }).filter(status => status.stories.length > 0);
+};
 
 export function StatusView() {
     const [viewingStatus, setViewingStatus] = useState<Status | null>(null);
+    const [stories, setStories] = useState<Status[]>(initialStories);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    
+    const activeStatuses = filterActiveStories(stories);
 
-    const myStatus = getStatusData(loggedInUserId);
-    const unreadStatuses = getUnreadStatuses();
-    const readStatuses = getReadStatuses();
+    const myStatus = activeStatuses.find(status => status.userId === loggedInUserId);
+    const unreadStatuses = activeStatuses.filter(status => !status.isRead && status.userId !== loggedInUserId);
+    const readStatuses = activeStatuses.filter(status => status.isRead && status.userId !== loggedInUserId);
 
     const handleViewStatus = (status: Status) => {
         setViewingStatus(status);
         // In a real app, you'd mark the status as read on the backend
-        const story = stories.find(s => s.userId === status.userId);
-        if (story) {
-            story.isRead = true;
-        }
+        setStories(prevStories => prevStories.map(s => 
+            s.userId === status.userId ? { ...s, isRead: true } : s
+        ));
     };
     
     const handleCloseViewer = () => {
         setViewingStatus(null);
     };
 
+    const handleMyStatusClick = () => {
+        if (myStatus) {
+            handleViewStatus(myStatus);
+        } else {
+            fileInputRef.current?.click();
+        }
+    };
+
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file && file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const imageUrl = e.target?.result as string;
+                const newStory: Story = {
+                    id: uuidv4(),
+                    imageUrl,
+                    timestamp: new Date().toISOString(),
+                };
+
+                setStories(prevStories => {
+                    const existingMyStatus = prevStories.find(s => s.userId === loggedInUserId);
+                    if (existingMyStatus) {
+                        return prevStories.map(s => 
+                            s.userId === loggedInUserId 
+                                ? { ...s, stories: [...s.stories, newStory], isRead: true }
+                                : s
+                        );
+                    } else {
+                        const newStatus: Status = {
+                            userId: loggedInUserId,
+                            stories: [newStory],
+                            isRead: true
+                        };
+                        return [...prevStories, newStatus];
+                    }
+                });
+            };
+            reader.readAsDataURL(file);
+        }
+         // Reset file input to allow selecting the same file again
+        if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+        }
+    };
+    
+    const getTimestamp = (status: Status) => {
+        const lastStory = status.stories[status.stories.length-1];
+        if (!lastStory) return '';
+        return formatDistanceToNow(new Date(lastStory.timestamp), { addSuffix: true });
+    };
+
     return (
         <div className="flex-1 overflow-y-auto p-4">
+            <input 
+                type="file" 
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                accept="image/*" 
+                className="hidden"
+            />
             <div className="space-y-6">
                 {/* My Status */}
                 <div 
                     className="flex items-center gap-4 cursor-pointer"
-                    onClick={() => myStatus && handleViewStatus(myStatus)}
+                    onClick={handleMyStatusClick}
                 >
                     <div className="relative">
                         <UserAvatar 
@@ -79,7 +142,7 @@ export function StatusView() {
                                         <UserAvatar user={user} className="h-14 w-14" withStatus />
                                         <div>
                                             <p className="font-semibold">{user.name}</p>
-                                            <p className="text-sm text-muted-foreground">{status.stories[status.stories.length-1].timestamp}</p>
+                                            <p className="text-sm text-muted-foreground">{getTimestamp(status)}</p>
                                         </div>
                                     </div>
                                 )
@@ -102,10 +165,10 @@ export function StatusView() {
                                         className="flex items-center gap-4 cursor-pointer"
                                         onClick={() => handleViewStatus(status)}
                                     >
-                                        <UserAvatar user={user} className="h-14 w-14" withStatus />
+                                        <UserAvatar user={user} className="h-14 w-14" withStatus isRead={status.isRead} />
                                         <div>
                                             <p className="font-semibold">{user.name}</p>
-                                            <p className="text-sm text-muted-foreground">{status.stories[status.stories.length-1].timestamp}</p>
+                                            <p className="text-sm text-muted-foreground">{getTimestamp(status)}</p>
                                         </div>
                                     </div>
                                 )
@@ -115,7 +178,7 @@ export function StatusView() {
                 )}
 
             </div>
-            {viewingStatus && (
+            {viewingStatus && viewingStatus.stories.length > 0 && (
                 <StatusViewer 
                     status={viewingStatus}
                     onClose={handleCloseViewer}

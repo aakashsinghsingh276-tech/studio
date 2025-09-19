@@ -56,7 +56,7 @@ export type Call = {
 export type Story = {
   id: string;
   imageUrl: string;
-  timestamp: string;
+  timestamp: string; // ISO 8601 date string
 };
 
 export type Status = {
@@ -107,34 +107,34 @@ export const calls: Call[] = [
     { id: 'call6', userId: 'user7', type: 'incoming', callType: 'audio', timestamp: 'Tuesday, 9:00 AM', duration: '1m 5s' },
   ];
 
-export const stories: Status[] = [
+export let stories: Status[] = [
   {
     userId: 'user1',
     isRead: true,
     stories: [
-      { id: 'story1_1', imageUrl: 'https://picsum.photos/seed/s1_1/400/700', timestamp: '2 hours ago' },
+      { id: 'story1_1', imageUrl: 'https://picsum.photos/seed/s1_1/400/700', timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString() },
     ]
   },
   {
     userId: 'user2',
     isRead: false,
     stories: [
-      { id: 'story2_1', imageUrl: 'https://picsum.photos/seed/s2_1/400/700', timestamp: 'Just now' },
-      { id: 'story2_2', imageUrl: 'https://picsum.photos/seed/s2_2/400/700', timestamp: '10 minutes ago' },
+      { id: 'story2_1', imageUrl: 'https://picsum.photos/seed/s2_1/400/700', timestamp: new Date(Date.now() - 10 * 60 * 1000).toISOString() },
+      { id: 'story2_2', imageUrl: 'https://picsum.photos/seed/s2_2/400/700', timestamp: new Date(Date.now() - 12 * 60 * 1000).toISOString() },
     ]
   },
   {
     userId: 'user3',
     isRead: false,
     stories: [
-      { id: 'story3_1', imageUrl: 'https://picsum.photos/seed/s3_1/400/700', timestamp: '30 minutes ago' },
+      { id: 'story3_1', imageUrl: 'https://picsum.photos/seed/s3_1/400/700', timestamp: new Date(Date.now() - 30 * 60 * 1000).toISOString() },
     ]
   },
   {
     userId: 'user4',
     isRead: true,
     stories: [
-        { id: 'story4_1', imageUrl: 'https://picsum.photos/seed/s4_1/400/700', timestamp: '8 hours ago' },
+        { id: 'story4_1', imageUrl: 'https://picsum.photos/seed/s4_1/400/700', timestamp: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString() },
     ]
   },
 ];

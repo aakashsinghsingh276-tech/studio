@@ -1,8 +1,7 @@
 
 "use client";
 
-import { useEffect, useState, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import Stories from 'react-insta-stories';
 import { X, MoreVertical, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -13,10 +12,9 @@ import {
     DialogTitle
 } from '@/components/ui/dialog';
 import { users, type Status } from '@/lib/data';
-import { Progress } from '../ui/progress';
 import { Input } from '../ui/input';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
-
+import { formatDistanceToNow } from 'date-fns';
 
 type StatusViewerProps = {
     status: Status;
@@ -26,30 +24,40 @@ type StatusViewerProps = {
 export function StatusViewer({ status, onClose }: StatusViewerProps) {
     const user = users.find(u => u.id === status.userId);
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [open, setOpen] = useState(true);
 
-    const storyContent = status.stories.map(story => ({
-        url: story.imageUrl,
-        duration: 5000,
-        header: {
-            heading: user?.name || 'User',
-            subheading: story.timestamp,
-            profileImage: user?.avatar.startsWith('http') ? user.avatar : `https://picsum.photos/seed/${user?.avatar}/200/200`
-        }
-    }));
+    const storyContent = useMemo(() => status.stories.map(story => {
+        const timestamp = formatDistanceToNow(new Date(story.timestamp), { addSuffix: true });
+        return {
+            url: story.imageUrl,
+            duration: 5000,
+            header: {
+                heading: user?.name || 'User',
+                subheading: timestamp,
+                profileImage: user?.avatar.startsWith('http') ? user.avatar : `https://picsum.photos/seed/${user?.avatar}/200/200`
+            }
+        };
+    }), [status, user]);
     
-    const storyDurations = storyContent.map(s => s.duration);
     const [progress, setProgress] = useState(0);
 
     const handleAllStoriesEnd = useCallback(() => {
-        onClose();
-    }, [onClose]);
+        setOpen(false);
+    }, []);
+
+    const handleDialogChange = (isOpen: boolean) => {
+        if (!isOpen) {
+            onClose();
+        }
+        setOpen(isOpen);
+    };
 
     useEffect(() => {
         let interval: NodeJS.Timeout;
         let timeout: NodeJS.Timeout;
 
         const startTime = Date.now();
-        const duration = storyDurations[currentIndex];
+        const duration = storyContent[currentIndex]?.duration || 5000;
 
         const updateProgress = () => {
             const elapsed = Date.now() - startTime;
@@ -67,7 +75,7 @@ export function StatusViewer({ status, onClose }: StatusViewerProps) {
             clearInterval(interval);
             clearTimeout(timeout);
         };
-    }, [currentIndex, storyDurations]);
+    }, [currentIndex, storyContent]);
 
     const handleStoryStart = (index: number) => {
         setCurrentIndex(index);
@@ -77,8 +85,8 @@ export function StatusViewer({ status, onClose }: StatusViewerProps) {
     if (!user) return null;
 
     return (
-        <Dialog open={true} onOpenChange={onClose}>
-            <DialogContent className="p-0 m-0 bg-black border-0 max-w-full h-full sm:rounded-none">
+        <Dialog open={open} onOpenChange={handleDialogChange}>
+            <DialogContent className="p-0 m-0 bg-black border-0 max-w-full h-full sm:rounded-none" onInteractOutside={(e) => e.preventDefault()}>
                  <VisuallyHidden>
                     <DialogTitle>Status Viewer: {user.name}</DialogTitle>
                 </VisuallyHidden>
@@ -103,14 +111,14 @@ export function StatusViewer({ status, onClose }: StatusViewerProps) {
                             <UserAvatar user={user} />
                             <div>
                                 <p className="font-semibold text-white">{user.name}</p>
-                                <p className="text-xs text-neutral-300">{status.stories[currentIndex].timestamp}</p>
+                                <p className="text-xs text-neutral-300">{storyContent[currentIndex]?.header.subheading}</p>
                             </div>
                         </div>
                         <div className="flex items-center">
                             <Button variant="ghost" size="icon" className="text-white">
                                 <MoreVertical />
                             </Button>
-                            <Button variant="ghost" size="icon" className="text-white" onClick={onClose}>
+                            <Button variant="ghost" size="icon" className="text-white" onClick={() => setOpen(false)}>
                                 <X />
                             </Button>
                         </div>
