@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useRef } from "react";
@@ -17,6 +18,55 @@ import { UserAvatar } from "@/components/chat/user-avatar";
 import { chats, users, loggedInUserId, type User } from "@/lib/data";
 import Image from "next/image";
 import placeholderData from '@/lib/placeholder-images.json';
+import { cn } from "@/lib/utils";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Separator } from "@/components/ui/separator";
+
+function ParticipantVideo({ user, isYou = false, isCameraOff = false, videoRef = null }: { user: User, isYou?: boolean, isCameraOff?: boolean, videoRef?: React.RefObject<HTMLVideoElement> | null }) {
+    const placeholder = placeholderData.placeholderImages.find(p => p.id === user?.avatar);
+    
+    return (
+        <div className="relative w-full h-full bg-zinc-800 rounded-lg overflow-hidden flex items-center justify-center">
+            {isYou ? (
+                <>
+                    <video
+                        ref={videoRef}
+                        className={cn("w-full h-full object-cover", isCameraOff ? 'hidden' : '')}
+                        autoPlay
+                        muted
+                    />
+                    {isCameraOff && (
+                        <div className="flex flex-col items-center gap-4">
+                            <UserAvatar user={user} className="h-32 w-32" />
+                            <p className="text-xl font-semibold">Camera is off</p>
+                        </div>
+                    )}
+                </>
+            ) : (
+                 <div className="flex flex-col items-center justify-center gap-4 text-center">
+                    {placeholder && (
+                        <Image
+                            src={placeholder.imageUrl}
+                            alt={user.name}
+                            fill
+                            className="object-cover"
+                            data-ai-hint={placeholder.imageHint}
+                        />
+                    )}
+                    <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center gap-4">
+                        <UserAvatar user={user} className="h-32 w-32" />
+                        <p className="text-xl font-semibold">{user.name}</p>
+                        <p className="text-muted-foreground">Connecting...</p>
+                    </div>
+                </div>
+            )}
+            <div className="absolute bottom-4 left-4 bg-black/50 rounded-md px-2 py-1 text-sm">
+                {isYou ? "You" : user.name}
+            </div>
+        </div>
+    )
+}
+
 
 export default function VideoCallPage() {
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
@@ -30,16 +80,13 @@ export default function VideoCallPage() {
 
   const chat = chats.find((c) => c.id === chatId);
   const me = users.find((u) => u.id === loggedInUserId);
-
-  const getChatPartner = (chatId: string): User | undefined => {
-    const currentChat = chats.find((c) => c.id === chatId);
-    if (!currentChat) return undefined;
-    const partnerId = currentChat.participants.find((p) => p !== loggedInUserId);
-    return users.find((u) => u.id === partnerId);
-  };
   
-  const partner = getChatPartner(chatId);
-  const placeholder = placeholderData.placeholderImages.find(p => p.id === partner?.avatar);
+  const participants = chat?.participants
+    .map(pId => users.find(u => u.id === pId))
+    .filter((u): u is User => !!u) || [];
+  
+  const otherParticipants = participants.filter(p => p.id !== loggedInUserId);
+
 
   useEffect(() => {
     const getCameraPermission = async () => {
@@ -101,46 +148,20 @@ export default function VideoCallPage() {
 
   return (
     <div className="bg-black text-white h-screen flex flex-col relative">
-      <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-2 p-2">
+      <div className={cn(
+          "flex-1 grid gap-2 p-2",
+          participants.length === 1 && "grid-cols-1 grid-rows-1",
+          participants.length === 2 && "grid-cols-2 grid-rows-1",
+          participants.length >= 3 && "grid-cols-2 grid-rows-2",
+          participants.length >= 5 && "grid-cols-3 grid-rows-2",
+      )}>
         {/* My Video */}
-        <div className="relative w-full h-full bg-zinc-800 rounded-lg overflow-hidden flex items-center justify-center">
-          <video
-            ref={videoRef}
-            className={`w-full h-full object-cover ${isCameraOff ? 'hidden' : ''}`}
-            autoPlay
-            muted
-          />
-          {isCameraOff && me && (
-            <div className="flex flex-col items-center gap-4">
-                <UserAvatar user={me} className="h-32 w-32" />
-                <p className="text-xl font-semibold">Camera is off</p>
-            </div>
-          )}
-          <div className="absolute bottom-4 left-4 bg-black/50 rounded-md px-2 py-1 text-sm">
-            You
-          </div>
-        </div>
+        {me && <ParticipantVideo user={me} isYou={true} isCameraOff={isCameraOff} videoRef={videoRef} />}
 
-        {/* Partner Video */}
-        <div className="relative w-full h-full bg-zinc-800 rounded-lg overflow-hidden flex items-center justify-center">
-          {partner && placeholder && (
-            <Image
-                src={placeholder.imageUrl}
-                alt={partner.name}
-                fill
-                className="object-cover"
-                data-ai-hint={placeholder.imageHint}
-            />
-          )}
-           <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center gap-4">
-                {partner && <UserAvatar user={partner} className="h-32 w-32" />}
-                <p className="text-xl font-semibold">{partner?.name || 'Partner'}</p>
-                <p className="text-muted-foreground">Connecting...</p>
-            </div>
-          <div className="absolute bottom-4 left-4 bg-black/50 rounded-md px-2 py-1 text-sm">
-            {partner?.name || 'Partner'}
-          </div>
-        </div>
+        {/* Other Participants */}
+        {otherParticipants.map(participant => (
+            <ParticipantVideo key={participant.id} user={participant} />
+        ))}
       </div>
 
       {!hasCameraPermission && hasCameraPermission !== null && (
@@ -181,13 +202,38 @@ export default function VideoCallPage() {
         >
           <PhoneOff />
         </Button>
-        <Button
-          variant="secondary"
-          size="icon"
-          className="rounded-full h-14 w-14 bg-zinc-700 hover:bg-zinc-600"
-        >
-          <Users />
-        </Button>
+         <Sheet>
+          <SheetTrigger asChild>
+            <Button
+              variant="secondary"
+              size="icon"
+              className="rounded-full h-14 w-14 bg-zinc-700 hover:bg-zinc-600"
+            >
+              <Users />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="right" className="bg-zinc-800 text-white border-zinc-700">
+            <SheetHeader>
+              <SheetTitle>Participants ({participants.length})</SheetTitle>
+            </SheetHeader>
+            <div className="flex flex-col gap-4 py-4">
+              {participants.map(user => (
+                <div key={user.id} className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <UserAvatar user={user} />
+                    <span>{user.id === loggedInUserId ? 'You' : user.name}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Mic className="h-5 w-5" />
+                    <Video className="h-5 w-5" />
+                  </div>
+                </div>
+              ))}
+            </div>
+             <Separator className="bg-zinc-700" />
+              <Button className="w-full mt-4 bg-zinc-700 hover:bg-zinc-600">Add participant</Button>
+          </SheetContent>
+        </Sheet>
       </div>
     </div>
   );

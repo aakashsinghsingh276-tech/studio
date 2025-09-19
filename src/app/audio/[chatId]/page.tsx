@@ -11,10 +11,12 @@ import {
   MicOff,
   PhoneOff,
   Users,
+  X
 } from "lucide-react";
 import { UserAvatar } from "@/components/chat/user-avatar";
 import { chats, users, loggedInUserId, type User } from "@/lib/data";
-import Image from "next/image";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Separator } from "@/components/ui/separator";
 
 export default function AudioCallPage() {
   const [hasMicPermission, setHasMicPermission] = useState<boolean | null>(null);
@@ -27,15 +29,10 @@ export default function AudioCallPage() {
 
   const chat = chats.find((c) => c.id === chatId);
   const me = users.find((u) => u.id === loggedInUserId);
-
-  const getChatPartner = (chatId: string): User | undefined => {
-    const currentChat = chats.find((c) => c.id === chatId);
-    if (!currentChat) return undefined;
-    const partnerId = currentChat.participants.find((p) => p !== loggedInUserId);
-    return users.find((u) => u.id === partnerId);
-  };
   
-  const partner = getChatPartner(chatId);
+  const participants = chat?.participants
+    .map(pId => users.find(u => u.id === pId))
+    .filter((u): u is User => !!u) || [];
 
   useEffect(() => {
     const getMicPermission = async () => {
@@ -87,23 +84,17 @@ export default function AudioCallPage() {
   return (
     <div className="bg-zinc-900 text-white h-screen flex flex-col relative items-center justify-center">
         <div className="absolute top-8 right-8">
-            <p className="text-muted-foreground">Now in call</p>
+            <p className="text-muted-foreground">In call with {chat?.name || 'group'}</p>
         </div>
       
       <div className="flex flex-col items-center gap-6">
-        <div className="flex items-center gap-8">
-            {me && (
-                <div className="flex flex-col items-center gap-3">
-                    <UserAvatar user={me} className="h-32 w-32" />
-                    <p className="font-semibold">You</p>
+        <div className="flex flex-wrap items-center justify-center gap-8 max-w-4xl">
+            {participants.map(user => (
+                 <div key={user.id} className="flex flex-col items-center gap-3">
+                    <UserAvatar user={user} className="h-32 w-32" />
+                    <p className="font-semibold">{user.id === loggedInUserId ? 'You' : user.name}</p>
                 </div>
-            )}
-            {partner && (
-                <div className="flex flex-col items-center gap-3">
-                    <UserAvatar user={partner} className="h-32 w-32" />
-                    <p className="font-semibold">{partner.name}</p>
-                </div>
-            )}
+            ))}
         </div>
         <p className="text-muted-foreground text-lg">Connecting...</p>
       </div>
@@ -140,13 +131,37 @@ export default function AudioCallPage() {
         >
           <PhoneOff />
         </Button>
-        <Button
-          variant="secondary"
-          size="icon"
-          className="rounded-full h-14 w-14 bg-zinc-700 hover:bg-zinc-600"
-        >
-          <Users />
-        </Button>
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button
+              variant="secondary"
+              size="icon"
+              className="rounded-full h-14 w-14 bg-zinc-700 hover:bg-zinc-600"
+            >
+              <Users />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="right" className="bg-zinc-800 text-white border-zinc-700">
+            <SheetHeader>
+              <SheetTitle>Participants ({participants.length})</SheetTitle>
+            </SheetHeader>
+            <div className="flex flex-col gap-4 py-4">
+              {participants.map(user => (
+                <div key={user.id} className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <UserAvatar user={user} />
+                    <span>{user.id === loggedInUserId ? 'You' : user.name}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Mic className="h-5 w-5" />
+                  </div>
+                </div>
+              ))}
+            </div>
+             <Separator className="bg-zinc-700" />
+              <Button className="w-full mt-4 bg-zinc-700 hover:bg-zinc-600">Add participant</Button>
+          </SheetContent>
+        </Sheet>
       </div>
     </div>
   );
