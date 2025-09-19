@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Stories from 'react-insta-stories';
 import { X, MoreVertical, Send } from 'lucide-react';
@@ -37,35 +37,42 @@ export function StatusViewer({ status, onClose }: StatusViewerProps) {
         }
     }));
     
-    // This is a hacky way to get the progress bar to work with react-insta-stories
     const storyDurations = storyContent.map(s => s.duration);
     const [progress, setProgress] = useState(0);
-    const [currentTimeout, setCurrentTimeout] = useState<NodeJS.Timeout | null>(null);
+
+    const handleAllStoriesEnd = useCallback(() => {
+        onClose();
+    }, [onClose]);
 
     useEffect(() => {
-        if(currentTimeout) clearTimeout(currentTimeout);
+        let interval: NodeJS.Timeout;
+        let timeout: NodeJS.Timeout;
 
         const startTime = Date.now();
         const duration = storyDurations[currentIndex];
 
-        const interval = setInterval(() => {
+        const updateProgress = () => {
             const elapsed = Date.now() - startTime;
             const newProgress = Math.min(100, (elapsed / duration) * 100);
             setProgress(newProgress);
-        }, 100);
-        
-        const timeout = setTimeout(() => {
+        };
+
+        interval = setInterval(updateProgress, 100);
+
+        timeout = setTimeout(() => {
             clearInterval(interval);
         }, duration);
 
-        setCurrentTimeout(timeout);
-
         return () => {
             clearInterval(interval);
-            if(timeout) clearTimeout(timeout);
+            clearTimeout(timeout);
         };
-
     }, [currentIndex, storyDurations]);
+
+    const handleStoryStart = (index: number) => {
+        setCurrentIndex(index);
+        setProgress(0);
+    };
 
     if (!user) return null;
 
@@ -73,7 +80,7 @@ export function StatusViewer({ status, onClose }: StatusViewerProps) {
         <Dialog open={true} onOpenChange={onClose}>
             <DialogContent className="p-0 m-0 bg-black border-0 max-w-full h-full sm:rounded-none">
                  <VisuallyHidden>
-                    <DialogTitle>Status Viewer</DialogTitle>
+                    <DialogTitle>Status Viewer: {user.name}</DialogTitle>
                 </VisuallyHidden>
 
                 {/* Custom Header */}
@@ -116,17 +123,13 @@ export function StatusViewer({ status, onClose }: StatusViewerProps) {
                     width="100%"
                     height="100%"
                     currentIndex={currentIndex}
-                    onStoryStart={(index) => {
-                        setCurrentIndex(index);
-                        setProgress(0);
-                    }}
-                    onAllStoriesEnd={onClose}
+                    onStoryStart={handleStoryStart}
+                    onAllStoriesEnd={handleAllStoriesEnd}
                     storyContainerStyles={{
                         backgroundColor: '#000',
                         overflow: 'hidden',
                         borderRadius: 'inherit'
                     }}
-                    
                 />
 
                  {/* Custom Footer */}
