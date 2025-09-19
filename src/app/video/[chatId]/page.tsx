@@ -21,6 +21,7 @@ import placeholderData from '@/lib/placeholder-images.json';
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
+import { AddParticipant } from "@/components/chat/add-participant";
 
 function ParticipantVideo({ user, isYou = false, isCameraOff = false, videoRef = null }: { user: User, isYou?: boolean, isCameraOff?: boolean, videoRef?: React.RefObject<HTMLVideoElement> | null }) {
     const placeholder = placeholderData.placeholderImages.find(p => p.id === user?.avatar);
@@ -81,9 +82,11 @@ export default function VideoCallPage() {
   const chat = chats.find((c) => c.id === chatId);
   const me = users.find((u) => u.id === loggedInUserId);
   
-  const participants = chat?.participants
+  const initialParticipants = chat?.participants
     .map(pId => users.find(u => u.id === pId))
     .filter((u): u is User => !!u) || [];
+
+  const [participants, setParticipants] = useState<User[]>(initialParticipants);
   
   const otherParticipants = participants.filter(p => p.id !== loggedInUserId);
 
@@ -144,6 +147,10 @@ export default function VideoCallPage() {
           setIsCameraOff(!track.enabled);
       });
     }
+  };
+  
+  const handleAddParticipants = (newParticipants: User[]) => {
+    setParticipants(prev => [...prev, ...newParticipants]);
   };
 
   return (
@@ -231,7 +238,12 @@ export default function VideoCallPage() {
               ))}
             </div>
              <Separator className="bg-zinc-700" />
-              <Button className="w-full mt-4 bg-zinc-700 hover:bg-zinc-600">Add participant</Button>
+              <AddParticipant 
+                currentParticipants={participants} 
+                onAddParticipants={handleAddParticipants}
+              >
+                <Button className="w-full mt-4 bg-zinc-700 hover:bg-zinc-600">Add participant</Button>
+              </AddParticipant>
           </SheetContent>
         </Sheet>
       </div>

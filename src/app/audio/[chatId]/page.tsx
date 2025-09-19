@@ -17,6 +17,7 @@ import { UserAvatar } from "@/components/chat/user-avatar";
 import { chats, users, loggedInUserId, type User } from "@/lib/data";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
+import { AddParticipant } from "@/components/chat/add-participant";
 
 export default function AudioCallPage() {
   const [hasMicPermission, setHasMicPermission] = useState<boolean | null>(null);
@@ -28,11 +29,13 @@ export default function AudioCallPage() {
   const chatId = params.chatId as string;
 
   const chat = chats.find((c) => c.id === chatId);
-  const me = users.find((u) => u.id === loggedInUserId);
   
-  const participants = chat?.participants
-    .map(pId => users.find(u => u.id === pId))
-    .filter((u): u is User => !!u) || [];
+  // Use state for participants so it can be updated
+  const [participants, setParticipants] = useState<User[]>(
+    chat?.participants
+      .map(pId => users.find(u => u.id === pId))
+      .filter((u): u is User => !!u) || []
+  );
 
   useEffect(() => {
     const getMicPermission = async () => {
@@ -79,6 +82,10 @@ export default function AudioCallPage() {
           setIsMicMuted(!track.enabled);
       });
     }
+  };
+
+  const handleAddParticipants = (newParticipants: User[]) => {
+    setParticipants(prev => [...prev, ...newParticipants]);
   };
 
   return (
@@ -159,7 +166,12 @@ export default function AudioCallPage() {
               ))}
             </div>
              <Separator className="bg-zinc-700" />
-              <Button className="w-full mt-4 bg-zinc-700 hover:bg-zinc-600">Add participant</Button>
+              <AddParticipant 
+                currentParticipants={participants} 
+                onAddParticipants={handleAddParticipants}
+              >
+                <Button className="w-full mt-4 bg-zinc-700 hover:bg-zinc-600">Add participant</Button>
+              </AddParticipant>
           </SheetContent>
         </Sheet>
       </div>
