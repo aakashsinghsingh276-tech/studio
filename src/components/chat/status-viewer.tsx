@@ -15,6 +15,7 @@ import { users, type Status } from '@/lib/data';
 import { Input } from '../ui/input';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { formatDistanceToNow } from 'date-fns';
+import placeholderData from '@/lib/placeholder-images.json';
 
 type StatusViewerProps = {
     status: Status;
@@ -28,13 +29,20 @@ export function StatusViewer({ status, onClose }: StatusViewerProps) {
 
     const storyContent = useMemo(() => status.stories.map(story => {
         const timestamp = formatDistanceToNow(new Date(story.timestamp), { addSuffix: true });
+        
+        let profileImageUrl = user?.avatar || '';
+        if (user && !user.avatar.startsWith('http')) {
+            const placeholder = placeholderData.placeholderImages.find(p => p.id === user.avatar);
+            profileImageUrl = placeholder?.imageUrl || `https://picsum.photos/seed/${user.avatar}/200/200`;
+        }
+        
         return {
             url: story.imageUrl,
             duration: 5000,
             header: {
                 heading: user?.name || 'User',
                 subheading: timestamp,
-                profileImage: user?.avatar.startsWith('http') ? user.avatar : `https://picsum.photos/seed/${user?.avatar}/200/200`
+                profileImage: profileImageUrl,
             }
         };
     }), [status, user]);
@@ -65,17 +73,19 @@ export function StatusViewer({ status, onClose }: StatusViewerProps) {
             setProgress(newProgress);
         };
 
-        interval = setInterval(updateProgress, 100);
+        if(open) {
+            interval = setInterval(updateProgress, 100);
 
-        timeout = setTimeout(() => {
-            clearInterval(interval);
-        }, duration);
+            timeout = setTimeout(() => {
+                clearInterval(interval);
+            }, duration);
+        }
 
         return () => {
             clearInterval(interval);
             clearTimeout(timeout);
         };
-    }, [currentIndex, storyContent]);
+    }, [currentIndex, storyContent, open]);
 
     const handleStoryStart = (index: number) => {
         setCurrentIndex(index);
@@ -154,3 +164,4 @@ export function StatusViewer({ status, onClose }: StatusViewerProps) {
         </Dialog>
     );
 }
+
