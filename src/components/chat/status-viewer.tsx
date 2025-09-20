@@ -63,8 +63,11 @@ export function StatusViewer({ status, onClose, onDeleteStory }: StatusViewerPro
     const [progress, setProgress] = useState(0);
 
     const handleAllStoriesEnd = useCallback(() => {
-        setOpen(false);
-    }, []);
+        setTimeout(() => {
+            setOpen(false);
+            onClose();
+        }, 0);
+    }, [onClose]);
 
     const handleDialogChange = (isOpen: boolean) => {
         if (!isOpen) {
