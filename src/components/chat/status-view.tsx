@@ -63,13 +63,17 @@ export function StatusView() {
                 };
 
                 setStories(prevStories => {
-                    const existingMyStatus = prevStories.find(s => s.userId === loggedInUserId);
-                    if (existingMyStatus) {
-                        return prevStories.map(s => 
-                            s.userId === loggedInUserId 
-                                ? { ...s, stories: [...s.stories, newStory], isRead: true }
-                                : s
-                        );
+                    const existingMyStatusIndex = prevStories.findIndex(s => s.userId === loggedInUserId);
+
+                    if (existingMyStatusIndex !== -1) {
+                        const updatedStories = [...prevStories];
+                        const myCurrentStatus = updatedStories[existingMyStatusIndex];
+                        updatedStories[existingMyStatusIndex] = {
+                            ...myCurrentStatus,
+                            stories: [...myCurrentStatus.stories, newStory],
+                            isRead: true, // Mark as read since you're adding to it
+                        };
+                        return updatedStories;
                     } else {
                         const newStatus: Status = {
                             userId: loggedInUserId,
@@ -90,19 +94,27 @@ export function StatusView() {
 
     const handleDeleteStory = (storyId: string) => {
         setStories(prevStories => {
-            return prevStories.map(status => {
+            const updatedStories = prevStories.map(status => {
                 if (status.userId === loggedInUserId) {
-                    const updatedStories = status.stories.filter(story => story.id !== storyId);
-                    // If this was the last story, it will be filtered out by filterActiveStories
-                    return { ...status, stories: updatedStories };
+                    const filteredStories = status.stories.filter(story => story.id !== storyId);
+                    return { ...status, stories: filteredStories };
                 }
                 return status;
-            });
+            }).filter(status => status.stories.length > 0); // Also remove the status container if no stories are left
+
+            // If we are currently viewing the status and all stories are deleted, close the viewer.
+             if (viewingStatus?.userId === loggedInUserId && updatedStories.find(s => s.userId === loggedInUserId)?.stories.length === 0) {
+                 handleCloseViewer();
+             } else if (viewingStatus?.userId === loggedInUserId) {
+                // otherwise, update the viewing status
+                const updatedMyStatus = updatedStories.find(s => s.userId === loggedInUserId);
+                if (updatedMyStatus) {
+                    setViewingStatus(updatedMyStatus);
+                }
+             }
+
+            return updatedStories;
         });
-         // Close the viewer if the last story was deleted
-        if (myStatus && myStatus.stories.length === 1) {
-            handleCloseViewer();
-        }
     };
     
     const getTimestamp = (status: Status) => {

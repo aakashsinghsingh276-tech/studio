@@ -36,29 +36,30 @@ export function StatusViewer({ status, onClose, onDeleteStory }: StatusViewerPro
     
     const isMyStatus = status.userId === loggedInUserId;
 
-    const storyContent = useMemo(() => status.stories.map(story => {
-        const timestamp = formatDistanceToNow(new Date(story.timestamp), { addSuffix: true });
-        
-        let profileImageUrl = user?.avatar || '';
-        const placeholder = user ? placeholderData.placeholderImages.find(p => p.id === user.avatar) : null;
-        if (user && placeholder) {
-            profileImageUrl = placeholder.imageUrl;
-        } else if (user && user.avatar.startsWith('http')) {
-            profileImageUrl = user.avatar;
-        } else {
-            profileImageUrl = `https://picsum.photos/seed/${user?.id || 'avatar'}/200/200`;
-        }
-        
-        return {
-            url: story.imageUrl,
-            duration: 5000,
-            header: {
-                heading: user?.name || 'User',
-                subheading: timestamp,
-                profileImage: profileImageUrl,
+    const storyContent = useMemo(() => {
+        if (!status?.stories) return [];
+        return status.stories.map(story => {
+            const timestamp = formatDistanceToNow(new Date(story.timestamp), { addSuffix: true });
+            
+            let profileImageUrl = '';
+            if (user?.avatar?.startsWith('http')) {
+                profileImageUrl = user.avatar;
+            } else if (user) {
+                const placeholder = placeholderData.placeholderImages.find(p => p.id === user.avatar);
+                profileImageUrl = placeholder?.imageUrl || `https://picsum.photos/seed/${user?.id || 'avatar'}/200/200`;
             }
-        };
-    }), [status, user]);
+
+            return {
+                url: story.imageUrl,
+                duration: 5000,
+                header: {
+                    heading: user?.name || 'User',
+                    subheading: timestamp,
+                    profileImage: profileImageUrl,
+                }
+            };
+        });
+    }, [status, user]);
     
     const [progress, setProgress] = useState(0);
 
@@ -109,13 +110,19 @@ export function StatusViewer({ status, onClose, onDeleteStory }: StatusViewerPro
     };
     
     const handleDeleteClick = () => {
+        if (!onDeleteStory || !status?.stories) return;
         const currentStoryId = status.stories[currentIndex]?.id;
-        if (currentStoryId && onDeleteStory) {
+        if (currentStoryId) {
             onDeleteStory(currentStoryId);
         }
     };
 
     if (!user) return null;
+    
+    if (storyContent.length === 0 && open) {
+        handleAllStoriesEnd();
+        return null;
+    }
 
     return (
         <Dialog open={open} onOpenChange={handleDialogChange}>
@@ -148,7 +155,7 @@ export function StatusViewer({ status, onClose, onDeleteStory }: StatusViewerPro
                             </div>
                         </div>
                         <div className="flex items-center">
-                            {isMyStatus && (
+                            {isMyStatus && onDeleteStory && (
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                         <Button variant="ghost" size="icon" className="text-white">
