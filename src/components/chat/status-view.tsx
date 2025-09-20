@@ -87,6 +87,23 @@ export function StatusView() {
             fileInputRef.current.value = "";
         }
     };
+
+    const handleDeleteStory = (storyId: string) => {
+        setStories(prevStories => {
+            return prevStories.map(status => {
+                if (status.userId === loggedInUserId) {
+                    const updatedStories = status.stories.filter(story => story.id !== storyId);
+                    // If this was the last story, it will be filtered out by filterActiveStories
+                    return { ...status, stories: updatedStories };
+                }
+                return status;
+            });
+        });
+         // Close the viewer if the last story was deleted
+        if (myStatus && myStatus.stories.length === 1) {
+            handleCloseViewer();
+        }
+    };
     
     const getTimestamp = (status: Status) => {
         const lastStory = status.stories[status.stories.length-1];
@@ -182,6 +199,7 @@ export function StatusView() {
                 <StatusViewer 
                     status={viewingStatus}
                     onClose={handleCloseViewer}
+                    onDeleteStory={handleDeleteStory}
                 />
             )}
         </div>
