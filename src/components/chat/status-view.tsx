@@ -145,7 +145,7 @@ export function StatusView() {
                             withStatus={!!myStatus}
                         />
                          {!myStatus && (
-                            <PlusCircle className="absolute -bottom-1 -right-1 h-6 w-6 text-white fill-pink-500 stroke-pink-500" />
+                            <PlusCircle className="absolute -bottom-1 -right-1 h-6 w-6 text-white fill-pink-500 bg-pink-500 rounded-full" />
                          )}
                     </div>
                     <div>
