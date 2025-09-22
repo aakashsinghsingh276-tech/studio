@@ -150,12 +150,12 @@ export function StatusView() {
                             isRead={myStatus?.isRead}
                         />
                         <button onClick={(e) => { e.stopPropagation(); handleAddStatusClick(); }} className="absolute -bottom-1 -right-1">
-                            <PlusCircle className="h-6 w-6 text-white fill-primary bg-primary rounded-full" />
+                            <PlusCircle className="h-6 w-6 text-white fill-primary bg-background rounded-full" />
                         </button>
                     </div>
                     <div>
                         <p className="font-semibold">My Status</p>
-                        <p className="text-sm text-muted-foreground">{myStatus ? "Click to view or add" : "Add new status"}</p>
+                        <p className="text-sm text-muted-foreground">{myStatus ? "Click to view or add" : "Add to my status"}</p>
                     </div>
                 </div>
 
