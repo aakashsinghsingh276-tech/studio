@@ -43,11 +43,7 @@ export function StatusView() {
     };
 
     const handleMyStatusClick = () => {
-        if (myStatus) {
-            handleViewStatus(myStatus);
-        } else {
-            fileInputRef.current?.click();
-        }
+        fileInputRef.current?.click();
     };
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -144,13 +140,11 @@ export function StatusView() {
                             className="h-14 w-14" 
                             withStatus={!!myStatus}
                         />
-                         {!myStatus && (
-                            <PlusCircle className="absolute -bottom-1 -right-1 h-6 w-6 text-white fill-pink-500 bg-pink-500 rounded-full" />
-                         )}
+                        <PlusCircle className="absolute -bottom-1 -right-1 h-6 w-6 text-white fill-pink-500 bg-pink-500 rounded-full" />
                     </div>
                     <div>
                         <p className="font-semibold">My Status</p>
-                        <p className="text-sm text-muted-foreground">{myStatus ? "View my status" : "Add to my status"}</p>
+                        <p className="text-sm text-muted-foreground">{myStatus ? "Add to my status" : "Add new status"}</p>
                     </div>
                 </div>
 
