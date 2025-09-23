@@ -13,7 +13,7 @@ export default function PhoneNumberPage() {
 
     const handleSendOtp = () => {
         // In a real app, you would send an OTP to the user's phone number.
-        localStorage.setItem("auth-step", "phone-pending");
+        localStorage.setItem("auth-step", "otp-pending");
         router.push("/verify-otp");
     };
 

@@ -19,7 +19,7 @@ export default function LoginPage() {
 
     const handleLogin = () => {
         // In a real app, you'd verify credentials
-        localStorage.setItem("auth-step", "phone-number");
+        localStorage.setItem("auth-step", "phone-pending");
         router.push("/phone-number");
     };
 
