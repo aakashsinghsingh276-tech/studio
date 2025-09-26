@@ -50,6 +50,10 @@ export function ChatView({ chat, onBack }: ChatViewProps) {
   const lastMessage = messages[messages.length - 1];
 
   useEffect(() => {
+    setMessages(chat.messages);
+  }, [chat.messages]);
+
+  useEffect(() => {
     if (lastMessage && lastMessage.senderId !== loggedInUserId && !lastMessage.attachment) {
       startSmartReplyTransition(async () => {
         const result = await generateSmartReplies({ message: lastMessage.content });
