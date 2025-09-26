@@ -1,55 +1,45 @@
 
 "use client";
 
-import { useState, useEffect, useTransition, useRef } from "react";
+import { useState, useRef } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Paperclip, Send, Smile, Loader2, Image as ImageIcon, Contact, MapPin, Film, Music } from "lucide-react";
-import { generateSmartReplies, describeImage } from "@/actions/ai-actions";
-import { type Message, type Attachment, users } from "@/lib/data";
-import { loggedInUserId } from "@/lib/data";
+import { Paperclip, Send, Smile, Loader2, Image as ImageIcon, Contact, MapPin } from "lucide-react";
+import { type Attachment, users } from "@/lib/data";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { useToast } from "@/hooks/use-toast";
 import EmojiPicker, { EmojiClickData } from 'emoji-picker-react';
 
 type ChatInputProps = {
   onSendMessage: (message: string, attachment?: Attachment) => void;
-  lastMessage: Message | undefined;
+  onImageDescribe: (photoDataUri: string, attachment: Attachment) => void;
+  suggestions: string[];
+  isAISuggesting: boolean;
+  isAIDescribing: boolean;
 };
 
-export function ChatInput({ onSendMessage, lastMessage }: ChatInputProps) {
+export function ChatInput({ 
+  onSendMessage, 
+  onImageDescribe,
+  suggestions,
+  isAISuggesting,
+  isAIDescribing,
+}: ChatInputProps) {
   const [message, setMessage] = useState("");
-  const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [isAISuggesting, startSmartReplyTransition] = useTransition();
-  const [isAIDescribing, startImageDescribeTransition] = useTransition();
   const { toast } = useToast();
-
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (lastMessage && lastMessage.senderId !== loggedInUserId && !lastMessage.attachment) {
-      startSmartReplyTransition(async () => {
-        const result = await generateSmartReplies({ message: lastMessage.content });
-        setSuggestions(result.suggestions);
-      });
-    } else {
-        setSuggestions([]);
-    }
-  }, [lastMessage]);
 
   const handleSend = () => {
     if (message.trim()) {
       onSendMessage(message.trim());
       setMessage("");
-      setSuggestions([]);
     }
   };
 
   const handleSuggestionClick = (suggestion: string) => {
     onSendMessage(suggestion);
     setMessage("");
-    setSuggestions([]);
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -95,11 +85,7 @@ export function ChatInput({ onSendMessage, lastMessage }: ChatInputProps) {
         };
         
         if (attachmentType === 'image') {
-            startImageDescribeTransition(async () => {
-                const result = await describeImage({ photoDataUri: url });
-                newAttachment.description = result.description;
-                onSendMessage("", newAttachment);
-            });
+           onImageDescribe(url, newAttachment);
         } else {
             onSendMessage("", newAttachment);
         }
@@ -256,5 +242,3 @@ export function ChatInput({ onSendMessage, lastMessage }: ChatInputProps) {
     </div>
   );
 }
-
-    
