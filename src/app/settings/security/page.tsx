@@ -3,6 +3,7 @@
 
 import * as React from "react";
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { 
     ArrowLeft, 
@@ -70,7 +71,7 @@ export default function SecurityPage() {
                     <CardTitle>Two-Step Verification</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="flex items-center justify-between p-4 rounded-lg hover:bg-secondary cursor-pointer">
+                    <Link href="/settings/security/two-step" className="flex items-center justify-between p-4 rounded-lg hover:bg-secondary cursor-pointer">
                         <div className="flex items-center gap-4">
                             <KeyRound className="h-6 w-6 text-muted-foreground" />
                             <div>
@@ -79,7 +80,7 @@ export default function SecurityPage() {
                             </div>
                         </div>
                         <ChevronRight className="h-5 w-5 text-muted-foreground" />
-                    </div>
+                    </Link>
                 </CardContent>
             </Card>
 
