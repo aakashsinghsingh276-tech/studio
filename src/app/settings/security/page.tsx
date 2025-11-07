@@ -71,7 +71,7 @@ export default function SecurityPage() {
                     <CardTitle>Two-Step Verification</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <Link href="/settings/security/two-step" className="flex items-center justify-between p-4 rounded-lg hover:bg-secondary cursor-pointer">
+                    <Link href="/settings/security/two-step" className="flex items-center justify-between p-4 rounded-lg hover:bg-secondary cursor-pointer -m-4">
                         <div className="flex items-center gap-4">
                             <KeyRound className="h-6 w-6 text-muted-foreground" />
                             <div>
