@@ -131,7 +131,7 @@ export function ChatView({ chat, onBack }: ChatViewProps) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>Clear Chat</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setMessages([])}>Clear Chat</DropdownMenuItem>
               <DropdownMenuItem>Block</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
