@@ -10,7 +10,7 @@ import {
   Phone,
   Video,
   Lock,
-  Trash2,
+  UserX,
 } from "lucide-react";
 import { UserAvatar } from "./user-avatar";
 import { MessageList } from "./message-list";
@@ -25,6 +25,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { generateSmartReplies, describeImage } from "@/actions/ai-actions";
+import { useToast } from "@/hooks/use-toast";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 type ChatViewProps = {
   chat: Chat;
@@ -36,6 +38,8 @@ export function ChatView({ chat, onBack }: ChatViewProps) {
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [isAISuggesting, startSmartReplyTransition] = useTransition();
   const [isAIDescribing, startImageDescribeTransition] = useTransition();
+  const [isBlocked, setIsBlocked] = useState(false);
+  const { toast } = useToast();
 
   const partner: User | undefined =
     chat.type === "private"
@@ -51,7 +55,8 @@ export function ChatView({ chat, onBack }: ChatViewProps) {
 
   useEffect(() => {
     setMessages(chat.messages);
-  }, [chat.messages]);
+    setIsBlocked(false); // Reset block state when chat changes
+  }, [chat]);
 
   useEffect(() => {
     if (lastMessage && lastMessage.senderId !== loggedInUserId && !lastMessage.attachment) {
@@ -65,6 +70,14 @@ export function ChatView({ chat, onBack }: ChatViewProps) {
   }, [lastMessage]);
 
   const handleSendMessage = (content: string, attachment?: Attachment) => {
+    if (isBlocked) {
+        toast({
+            variant: "destructive",
+            title: "Cannot send message",
+            description: `You have blocked ${chatName}. Unblock them to send a message.`,
+        });
+        return;
+    }
     const newMessage: MessageType = {
       id: `msg${Date.now()}`,
       chatId: chat.id,
@@ -81,6 +94,14 @@ export function ChatView({ chat, onBack }: ChatViewProps) {
   };
 
   const handleImageDescribe = (photoDataUri: string, baseAttachment: Attachment) => {
+    if (isBlocked) {
+        toast({
+            variant: "destructive",
+            title: "Cannot send message",
+            description: `You have blocked ${chatName}. Unblock them to send a message.`,
+        });
+        return;
+    }
     startImageDescribeTransition(async () => {
         const result = await describeImage({ photoDataUri });
         const newAttachment = { ...baseAttachment, description: result.description };
@@ -92,6 +113,14 @@ export function ChatView({ chat, onBack }: ChatViewProps) {
     setMessages((prev) => prev.filter((msg) => msg.id !== messageId));
   };
   
+  const toggleBlock = () => {
+    setIsBlocked(!isBlocked);
+    toast({
+        title: isBlocked ? `Unblocked ${chatName}` : `Blocked ${chatName}`,
+        description: isBlocked ? `You can now send messages to ${chatName}.` : `You will no longer receive messages from ${chatName}.`,
+    });
+  };
+
   return (
     <div className="flex flex-col h-full w-full">
       {/* Chat Header */}
@@ -132,14 +161,31 @@ export function ChatView({ chat, onBack }: ChatViewProps) {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => setMessages([])}>Clear Chat</DropdownMenuItem>
-              <DropdownMenuItem>Block</DropdownMenuItem>
+              {chat.type === 'private' && (
+                <DropdownMenuItem onClick={toggleBlock}>
+                  {isBlocked ? 'Unblock' : 'Block'}
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </header>
 
       {/* Message List */}
-      <MessageList messages={messages} onDeleteMessage={handleDeleteMessage} />
+      <div className="flex-1 flex flex-col">
+        <MessageList messages={messages} onDeleteMessage={handleDeleteMessage} />
+        {isBlocked && (
+            <div className="p-4">
+                <Alert variant="destructive">
+                    <UserX className="h-4 w-4" />
+                    <AlertTitle>User Blocked</AlertTitle>
+                    <AlertDescription>
+                        You have blocked {chatName}. You cannot send or receive messages.
+                    </AlertDescription>
+                </Alert>
+            </div>
+        )}
+      </div>
 
       {/* Chat Input */}
       <ChatInput
@@ -148,6 +194,7 @@ export function ChatView({ chat, onBack }: ChatViewProps) {
         suggestions={suggestions}
         isAISuggesting={isAISuggesting}
         isAIDescribing={isAIDescribing}
+        disabled={isBlocked}
       />
     </div>
   );

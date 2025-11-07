@@ -17,6 +17,7 @@ type ChatInputProps = {
   suggestions: string[];
   isAISuggesting: boolean;
   isAIDescribing: boolean;
+  disabled?: boolean;
 };
 
 export function ChatInput({ 
@@ -25,6 +26,7 @@ export function ChatInput({
   suggestions,
   isAISuggesting,
   isAIDescribing,
+  disabled = false,
 }: ChatInputProps) {
   const [message, setMessage] = useState("");
   const { toast } = useToast();
@@ -183,18 +185,18 @@ export function ChatInput({
       <div className="flex items-end gap-2">
         <div className="flex-1 relative">
             <Textarea
-                placeholder="Type a message..."
+                placeholder={disabled ? "You have blocked this user" : "Type a message..."}
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyDown={handleKeyDown}
                 rows={1}
                 className="pr-24 min-h-0 resize-none"
-                disabled={isProcessing}
+                disabled={isProcessing || disabled}
             />
             <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
                  <Popover>
                     <PopoverTrigger asChild>
-                        <Button variant="ghost" size="icon" disabled={isProcessing}>
+                        <Button variant="ghost" size="icon" disabled={isProcessing || disabled}>
                             <Paperclip className="h-5 w-5 text-muted-foreground" />
                         </Button>
                     </PopoverTrigger>
@@ -221,7 +223,7 @@ export function ChatInput({
                 </Popover>
                 <Popover>
                     <PopoverTrigger asChild>
-                        <Button variant="ghost" size="icon" disabled={isProcessing}>
+                        <Button variant="ghost" size="icon" disabled={isProcessing || disabled}>
                             <Smile className="h-5 w-5 text-muted-foreground" />
                         </Button>
                     </PopoverTrigger>
@@ -235,7 +237,7 @@ export function ChatInput({
                 <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept="image/*,video/*,audio/*" />
             </div>
         </div>
-        <Button onClick={handleSend} size="icon" className="h-10 w-10 shrink-0" disabled={!message.trim() || isProcessing}>
+        <Button onClick={handleSend} size="icon" className="h-10 w-10 shrink-0" disabled={!message.trim() || isProcessing || disabled}>
           <Send className="h-5 w-5" />
         </Button>
       </div>
