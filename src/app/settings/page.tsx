@@ -31,15 +31,27 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import { ThemeSubMenu } from "@/components/theme-toggle";
 import { UserAvatar } from "@/components/chat/user-avatar";
 import { users, loggedInUserId } from "@/lib/data";
 import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/hooks/use-toast";
 
 
-const SettingsItem = ({ icon, text, hasNav = true, href }: { icon: React.ElementType, text: string, hasNav?: boolean, href?: string }) => {
+const SettingsItem = ({ icon, text, hasNav = true, href, onClick }: { icon: React.ElementType, text: string, hasNav?: boolean, href?: string, onClick?: () => void }) => {
     const content = (
-        <div className="flex items-center justify-between p-4 rounded-lg hover:bg-secondary cursor-pointer">
+        <div className="flex items-center justify-between p-4 rounded-lg hover:bg-secondary cursor-pointer" onClick={onClick}>
             <div className="flex items-center gap-4">
                 {React.createElement(icon, { className: "h-6 w-6 text-muted-foreground" })}
                 <p className="font-semibold">{text}</p>
@@ -58,10 +70,21 @@ const SettingsItem = ({ icon, text, hasNav = true, href }: { icon: React.Element
 
 export default function SettingsPage() {
   const router = useRouter();
+  const { toast } = useToast();
   const me = users.find((u) => u.id === loggedInUserId);
 
   const handleBack = () => {
     router.back();
+  };
+
+  const handleDeleteAccount = () => {
+    localStorage.removeItem('auth-step');
+    toast({
+        title: "Account Deleted",
+        description: "Your account has been successfully deleted.",
+        variant: "destructive"
+    });
+    router.push('/signup');
   };
   
   return (
@@ -100,7 +123,31 @@ export default function SettingsPage() {
                     <Separator />
                     <SettingsItem icon={FileText} text="Request account info" />
                      <Separator />
-                    <SettingsItem icon={Trash2} text="Delete account" />
+                     <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                            <div className="flex items-center justify-between p-4 rounded-lg hover:bg-secondary cursor-pointer text-destructive">
+                                <div className="flex items-center gap-4">
+                                    <Trash2 className="h-6 w-6" />
+                                    <p className="font-semibold">Delete account</p>
+                                </div>
+                            </div>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                This action cannot be undone. This will permanently delete your
+                                account and remove your data from our servers.
+                            </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={handleDeleteAccount} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                                Delete
+                            </AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
                 </CardContent>
             </Card>
 
