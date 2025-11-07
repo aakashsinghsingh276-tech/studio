@@ -28,7 +28,7 @@ type ContactListProps = {
 export function ContactList({ users }: ContactListProps) {
 
   const findChatIdByUser = (userId: string) => {
-    const chat = chats.find(c => c.participants.includes(userId));
+    const chat = chats.find(c => c.type === 'private' && c.participants.includes(userId));
     return chat ? chat.id : null;
   }
 
@@ -64,6 +64,7 @@ export function ContactList({ users }: ContactListProps) {
                      {user.status}
                   </TableCell>
                    <TableCell className="text-right">
+                      <div className="inline-flex">
                        <Button variant="ghost" size="icon" asChild>
                            <Link href={chatId ? `/video/${chatId}` : "#"}>
                                 <Video className="h-5 w-5 text-muted-foreground" />
@@ -79,6 +80,7 @@ export function ContactList({ users }: ContactListProps) {
                                <MessageSquare className="h-5 w-5 text-muted-foreground" />
                            </Link>
                        </Button>
+                      </div>
                   </TableCell>
                 </TableRow>
               );
